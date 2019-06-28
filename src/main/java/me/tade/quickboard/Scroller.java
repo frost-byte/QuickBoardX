@@ -13,8 +13,8 @@ import java.util.List;
 public class Scroller {
 
     private static final char COLOUR_CHAR = '§';
-    public int width, spaceBetween;
-    public String text;
+    private int width, spaceBetween;
+    String text;
     private int position;
     private List<String> list;
     private ChatColor colour = ChatColor.RESET;
@@ -27,7 +27,7 @@ public class Scroller {
      * @param colourChar   The colour code character you're using (i.e. & or §)
      */
     public Scroller(String message, int width, int spaceBetween, char colourChar) {
-        list = new ArrayList<String>();
+        list = new ArrayList<>();
 
         text = message;
 
@@ -37,7 +37,7 @@ public class Scroller {
     /**
      * @return Gets the next String to display
      */
-    public String next() {
+    String next() {
         StringBuilder sb = getNext();
         if (sb.charAt(sb.length() - 1) == COLOUR_CHAR)
             sb.setCharAt(sb.length() - 1, ' ');
@@ -60,7 +60,12 @@ public class Scroller {
         return new StringBuilder(list.get(position++ % list.size()));
     }
 
-    public void setupText(String message, int width, int spaceBetween, char colourChar) {
+    @SuppressWarnings("SameParameterValue")
+    void setupText(String message, char colourChar) {
+        setupText(message, this.width, this.spaceBetween, colourChar);
+    }
+
+    private void setupText(String message, int width, int spaceBetween, char colourChar) {
         list.clear();
 
         this.width = width;

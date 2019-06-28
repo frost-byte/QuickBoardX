@@ -3,7 +3,9 @@ package me.tade.quickboard.events;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings("unused")
 public class WhenPluginUpdateTextEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
@@ -37,6 +39,7 @@ public class WhenPluginUpdateTextEvent extends Event {
         return text;
     }
 
+    @NotNull
     @Override
     public HandlerList getHandlers() {
         return handlers;

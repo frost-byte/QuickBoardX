@@ -4,8 +4,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.ByteArrayOutputStream;
@@ -24,6 +24,7 @@ import java.util.zip.GZIPOutputStream;
  * <p>
  * Check out https://bStats.org/ to learn more about bStats!
  */
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class Metrics {
 
     // The version of this bStats class
@@ -35,7 +36,7 @@ public class Metrics {
     // The uuid of the server
     private static String serverUUID;
 
-    static {
+    static { // Is this really necessary, when using the shading plugin is properly configured?
         // Maven's Relocate is clever and changes strings, too. So we have to use this little "trick" ... :D
         final String defaultPackage = new String(new byte[]{'o', 'r', 'g', '.', 'b', 's', 't', 'a', 't', 's'});
         final String examplePackage = new String(new byte[]{'y', 'o', 'u', 'r', '.', 'p', 'a', 'c', 'k', 'a', 'g', 'e'});
@@ -205,12 +206,7 @@ public class Metrics {
                 }
                 // Nevertheless we want our code to run in the Bukkit main thread, so we have to use the Bukkit scheduler
                 // Don't be afraid! The connection to the bStats server is still async, only the stats collection is sync ;)
-                Bukkit.getScheduler().runTask(plugin, new Runnable() {
-                    @Override
-                    public void run() {
-                        submitData();
-                    }
-                });
+                Bukkit.getScheduler().runTask(plugin, () -> submitData());
             }
         }, 1000 * 60 * 5, 1000 * 60 * 30);
         // Submit the data every 30 minutes, first time after 5 minutes to give other plugins enough time to start
@@ -239,7 +235,7 @@ public class Metrics {
             if (chart == null) { // If the chart is null, we skip it
                 continue;
             }
-            customCharts.add(chart);
+            customCharts.put(chart);
         }
         data.put("customCharts", customCharts);
 
@@ -298,7 +294,7 @@ public class Metrics {
             }
             // Found one!
             try {
-                pluginData.add(service.getMethod("getPluginData").invoke(Bukkit.getServicesManager().load(service)));
+                pluginData.put(service.getMethod("getPluginData").invoke(Bukkit.getServicesManager().load(service)));
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {
             }
         }
@@ -306,17 +302,14 @@ public class Metrics {
         data.put("plugins", pluginData);
 
         // Create a new thread for the connection to the bStats server
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    // Send the data
-                    sendData(data);
-                } catch (Exception e) {
-                    // Something went wrong! :(
-                    if (logFailedRequests) {
-                        plugin.getLogger().log(Level.WARNING, "Could not submit plugin stats of " + plugin.getName(), e);
-                    }
+        new Thread(() -> {
+            try {
+                // Send the data
+                sendData(data);
+            } catch (Exception e) {
+                // Something went wrong! :(
+                if (logFailedRequests) {
+                    plugin.getLogger().log(Level.WARNING, "Could not submit plugin stats of " + plugin.getName(), e);
                 }
             }
         }).start();
@@ -640,6 +633,7 @@ public class Metrics {
     /**
      * Represents a custom chart.
      */
+    @SuppressWarnings("WeakerAccess")
     public static abstract class CustomChart {
 
         // The id of the chart
@@ -683,6 +677,7 @@ public class Metrics {
     /**
      * Represents a custom simple pie.
      */
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public static abstract class SimplePie extends CustomChart {
 
         /**
@@ -717,6 +712,7 @@ public class Metrics {
     /**
      * Represents a custom advanced pie.
      */
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public static abstract class AdvancedPie extends CustomChart {
 
         /**
@@ -741,7 +737,7 @@ public class Metrics {
         protected JSONObject getChartData() {
             JSONObject data = new JSONObject();
             JSONObject values = new JSONObject();
-            HashMap<String, Integer> map = getValues(new HashMap<String, Integer>());
+            HashMap<String, Integer> map = getValues(new HashMap<>());
             if (map == null || map.isEmpty()) {
                 // Null = skip the chart
                 return null;
@@ -766,6 +762,7 @@ public class Metrics {
     /**
      * Represents a custom single line chart.
      */
+    @SuppressWarnings("WeakerAccess")
     public static abstract class SingleLineChart extends CustomChart {
 
         /**
@@ -801,6 +798,7 @@ public class Metrics {
     /**
      * Represents a custom multi line chart.
      */
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public static abstract class MultiLineChart extends CustomChart {
 
         /**
@@ -825,7 +823,7 @@ public class Metrics {
         protected JSONObject getChartData() {
             JSONObject data = new JSONObject();
             JSONObject values = new JSONObject();
-            HashMap<String, Integer> map = getValues(new HashMap<String, Integer>());
+            HashMap<String, Integer> map = getValues(new HashMap<>());
             if (map == null || map.isEmpty()) {
                 // Null = skip the chart
                 return null;
@@ -851,6 +849,7 @@ public class Metrics {
     /**
      * Represents a custom simple bar chart.
      */
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public static abstract class SimpleBarChart extends CustomChart {
 
         /**
@@ -875,14 +874,14 @@ public class Metrics {
         protected JSONObject getChartData() {
             JSONObject data = new JSONObject();
             JSONObject values = new JSONObject();
-            HashMap<String, Integer> map = getValues(new HashMap<String, Integer>());
+            HashMap<String, Integer> map = getValues(new HashMap<>());
             if (map == null || map.isEmpty()) {
                 // Null = skip the chart
                 return null;
             }
             for (Map.Entry<String, Integer> entry : map.entrySet()) {
                 JSONArray categoryValues = new JSONArray();
-                categoryValues.add(entry.getValue());
+                categoryValues.put(entry.getValue());
                 values.put(entry.getKey(), categoryValues);
             }
             data.put("values", values);
@@ -894,6 +893,7 @@ public class Metrics {
     /**
      * Represents a custom advanced bar chart.
      */
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public static abstract class AdvancedBarChart extends CustomChart {
 
         /**
@@ -918,7 +918,7 @@ public class Metrics {
         protected JSONObject getChartData() {
             JSONObject data = new JSONObject();
             JSONObject values = new JSONObject();
-            HashMap<String, int[]> map = getValues(new HashMap<String, int[]>());
+            HashMap<String, int[]> map = getValues(new HashMap<>());
             if (map == null || map.isEmpty()) {
                 // Null = skip the chart
                 return null;
@@ -931,7 +931,7 @@ public class Metrics {
                 allSkipped = false;
                 JSONArray categoryValues = new JSONArray();
                 for (int categoryValue : entry.getValue()) {
-                    categoryValues.add(categoryValue);
+                    categoryValues.put(categoryValue);
                 }
                 values.put(entry.getKey(), categoryValues);
             }
@@ -948,6 +948,7 @@ public class Metrics {
     /**
      * Represents a custom simple map chart.
      */
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public static abstract class SimpleMapChart extends CustomChart {
 
         /**
@@ -984,6 +985,7 @@ public class Metrics {
     /**
      * Represents a custom advanced map chart.
      */
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public static abstract class AdvancedMapChart extends CustomChart {
 
         /**
@@ -1008,7 +1010,7 @@ public class Metrics {
         protected JSONObject getChartData() {
             JSONObject data = new JSONObject();
             JSONObject values = new JSONObject();
-            HashMap<Country, Integer> map = getValues(new HashMap<Country, Integer>());
+            HashMap<Country, Integer> map = getValues(new HashMap<>());
             if (map == null || map.isEmpty()) {
                 // Null = skip the chart
                 return null;

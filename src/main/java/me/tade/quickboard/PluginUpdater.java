@@ -11,13 +11,13 @@ import java.net.URL;
  *
  * @author The_TadeSK
  */
-public class PluginUpdater {
+class PluginUpdater {
 
 	private QuickBoard plugin;
 	private boolean needUpdate;
 	private String[] updateInfo;
 
-	public PluginUpdater(QuickBoard plugin) {
+	PluginUpdater(QuickBoard plugin) {
 		this.plugin = plugin;
 
 		new BukkitRunnable(){
@@ -27,11 +27,11 @@ public class PluginUpdater {
 		}.runTaskTimerAsynchronously(plugin, 20, 1800 * 20);
 	}
 
-	public void doUpdate(){
+	private void doUpdate(){
 		String response = getResponse();
 
 		if(response == null){
-			System.out.println("Some sort of error happend! Can't get new version of QuickBoard!");
+			System.out.println("Some sort of error happened! Can't get new version of QuickBoard!");
 			return;
 		}
 		updateInfo = response.split(";");
@@ -49,20 +49,19 @@ public class PluginUpdater {
 		plugin.sendUpdateMessage();
 	}
 
-	public String getResponse(){
+	private String getResponse(){
 		try {
 			System.out.println("Trying to get new version of QuickBoard...");
-			URL post = new URL("https://raw.githubusercontent.com/TheTadeSK/QuickBoard/master/VERSION");
+			URL post = new URL("https://raw.githubusercontent.com/frost-byte/QuickBoard/master/VERSION");
 
-			String result = get(post);
-			return result;
+			return get(post);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
 		return null;
 	}
 
-	public String get(URL url){
+	private String get(URL url){
 		BufferedReader br = null;
 
 		try {
@@ -94,11 +93,11 @@ public class PluginUpdater {
 		return null;
 	}
 
-	public boolean needUpdate() {
+	boolean needUpdate() {
 		return needUpdate;
 	}
 
-	public String[] getUpdateInfo() {
+	String[] getUpdateInfo() {
 		return updateInfo;
 	}
 }

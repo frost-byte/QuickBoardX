@@ -1,6 +1,7 @@
 package me.tade.quickboard;
 
 import me.clip.placeholderapi.PlaceholderAPI;
+import me.tade.quickboard.config.BoardConfig;
 import me.tade.quickboard.events.PlayerReceiveBoardEvent;
 import me.tade.quickboard.events.WhenPluginUpdateTextEvent;
 import org.bukkit.Bukkit;
@@ -15,7 +16,6 @@ import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 public class PlayerBoard {
@@ -36,7 +36,7 @@ public class PlayerBoard {
     private int titleTask;
     private int textTask;
     private boolean ch = false;
-    private ScoreboardInfo info = null;
+    private BoardConfig info = null;
     private HashMap<String, String> chanText = new HashMap<>();
     private HashMap<String, Integer> chanTextInt = new HashMap<>();
     private HashMap<String, String> scrollerText = new HashMap<>();
@@ -44,19 +44,20 @@ public class PlayerBoard {
     private boolean ver13 = false;
 
     private int index = 15;
-    private int titleindex = 0;
+    private int titleIndex = 0;
 
-    public PlayerBoard(QuickBoard plugin, Player player, ScoreboardInfo info) {
+    public PlayerBoard(QuickBoard plugin, Player player, BoardConfig info) {
         this.plugin = plugin;
         this.player = player;
         list = info.getText();
         title = info.getTitle();
-        updateTitle = info.getTitleUpdate();
-        updateText = info.getTextUpdate();
+        updateTitle = info.getUpdaterTitle();
+        updateText = info.getUpdaterText();
 
-        for (String s : info.getChangeText().keySet()) {
+        List<String> changeKeys = info.getChangeables();
+        for (String s : changeKeys) {
             chanTextInt.put(s, 0);
-            chanText.put(s, info.getChangeText().get(s).get(0));
+            chanText.put(s, info.getChangeableText(s).get(0));
         }
 
         this.info = info;
@@ -68,7 +69,14 @@ public class PlayerBoard {
         }
     }
 
-    public PlayerBoard(QuickBoard plugin, Player player, List<String> text, List<String> title, int updateTitle, int updateText) {
+    PlayerBoard(
+        QuickBoard plugin,
+        Player player,
+        List<String> text,
+        List<String> title,
+        int updateTitle,
+        int updateText
+    ) {
         this.plugin = plugin;
         this.player = player;
         this.updateTitle = updateTitle;
@@ -84,15 +92,16 @@ public class PlayerBoard {
         }
     }
 
-    public void startSetup(final PlayerReceiveBoardEvent event) {
+    private void startSetup(final PlayerReceiveBoardEvent event) {
         if (plugin.getBoards().containsKey(getPlayer())) {
             plugin.getBoards().get(getPlayer()).remove();
         }
-        ver13 = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3].contains("13");
+        String version = Bukkit.getBukkitVersion(); // Returns in format like: 1.12.2-R0.1-SNAPSHOT
+        ver13 = version.startsWith("1.13") || version.startsWith("1.14");
         colorize();
-        titleindex = event.getTitle().size();
+        titleIndex = event.getTitle().size();
         plugin.getBoards().put(getPlayer(), this);
-        plugin.getAllboards().add(this);
+        plugin.getAllBoards().add(this);
 
         buildScoreboard(event);
 
@@ -101,29 +110,28 @@ public class PlayerBoard {
         updater();
     }
 
-    public void buildScoreboard(PlayerReceiveBoardEvent event) {
+    private void buildScoreboard(PlayerReceiveBoardEvent event) {
         board = Bukkit.getScoreboardManager().getNewScoreboard();
-        score = board.registerNewObjective("score", "dummy");
+        score = board.registerNewObjective("score", "dummy", event.getTitle().get(0));
         score.setDisplaySlot(DisplaySlot.SIDEBAR);
+
         if (event.getTitle().size() == 0)
             event.getTitle().add(" ");
-
-        score.setDisplayName(event.getTitle().get(0));
 
         getPlayer().setScoreboard(board);
     }
 
-    public void setUpText(final List<String> text) {
+    private void setUpText(final List<String> text) {
         int oi = 0;
-        Iterator<String> tex = text.iterator();
-        while (tex.hasNext()) {
-            String s = tex.next();
+        for (String s : text)
+        {
             Team t = board.registerNewTeam("Team:" + index);
             String normal = s;
             String sc = chlist.get(oi);
             t.addEntry(sc);
             s = setHolders(s);
-            if (s.length() < 3) {
+            if (s.length() < 3)
+            {
                 s = s + "§r";
             }
             String[] ts = splitString(s);
@@ -137,31 +145,34 @@ public class PlayerBoard {
         }
     }
 
-    public void colorize() {
+    private void colorize() {
         for (ChatColor color : ChatColor.values()) {
             chlist.add(color.toString() + ChatColor.RESET.toString());
         }
     }
 
-    public void updateText() {
+    void updateText() {
         if (ch) {
             return;
         }
 
-        Iterator<Team> teams = this.teams.iterator();
-
-        while (teams.hasNext()) {
-            Team t = teams.next();
+        for (Team t : this.teams)
+        {
             String s = lot.get(t);
-            if (info != null) {
-                for (String a : info.getChangeText().keySet()) {
-                    if (s.contains("{CH_" + a + "}")) {
+            if (info != null)
+            {
+                for (String a : info.getChangeables())
+                {
+                    if (s.contains("{CH_" + a + "}"))
+                    {
                         s = s.replace("{CH_" + a + "}", "");
                         s = s + chanText.get(a);
                     }
                 }
-                for (String a : info.getScrollerText().keySet()) {
-                    if (s.contains("{SC_" + a + "}")) {
+                for (String a : info.getScrollerNames())
+                {
+                    if (s.contains("{SC_" + a + "}"))
+                    {
                         s = s.replace("{SC_" + a + "}", "");
                         s = s + scrollerText.get(a);
                     }
@@ -177,7 +188,7 @@ public class PlayerBoard {
         }
     }
 
-    public void setPrefix(Team t, String string) {
+    private void setPrefix(Team t, String string) {
         if (string.length() > getMaxSize()) {
             t.setPrefix(maxChars(getMaxSize(), string));
             return;
@@ -185,7 +196,7 @@ public class PlayerBoard {
         t.setPrefix(string);
     }
 
-    public void setSuffix(Team t, String string) {
+    private void setSuffix(Team t, String string) {
         if (string.length() > getMaxSize()) {
             t.setSuffix(maxChars(getMaxSize(), string));
             return;
@@ -193,7 +204,7 @@ public class PlayerBoard {
         t.setSuffix(string);
     }
 
-    public String setHolders(String s) {
+    private String setHolders(String s) {
         s = s.replace("{PLAYER}", getPlayer().getName()).replace("{ONLINE}", Bukkit.getOnlinePlayers().size() + "")
                 .replace("{TIME}", getPlayer().getWorld().getTime() + "");
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI") && PlaceholderAPI.containsPlaceholders(s))
@@ -205,24 +216,24 @@ public class PlayerBoard {
         return s;
     }
 
-    public int getMaxSize() {
+    private int getMaxSize() {
         if (ver13)
             return 64;
         return 16;
     }
 
-    public void updateTitle() {
+    void updateTitle() {
         if (ch) {
             return;
         }
-        if (titleindex > (title.size() - 1)) {
-            titleindex = 0;
+        if (titleIndex > (title.size() - 1)) {
+            titleIndex = 0;
         }
-        score.setDisplayName(maxChars(ver13 ? 128 : 32, setHolders(title.get(titleindex))));
-        titleindex++;
+        score.setDisplayName(maxChars(ver13 ? 128 : 32, setHolders(title.get(titleIndex))));
+        titleIndex++;
     }
 
-    public String maxChars(int characters, String string) {
+    private String maxChars(int characters, String string) {
         if (ChatColor.translateAlternateColorCodes('&', string).length() > characters)
             return string.substring(0, characters);
         return ChatColor.translateAlternateColorCodes('&', string);
@@ -231,11 +242,11 @@ public class PlayerBoard {
     public void remove() {
         stopTasks();
         plugin.getBoards().remove(getPlayer());
-        plugin.getAllboards().remove(this);
+        plugin.getAllBoards().remove(this);
         getPlayer().setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
     }
 
-    protected void stopTasks() {
+    void stopTasks() {
         Bukkit.getScheduler().cancelTask(titleTask);
         Bukkit.getScheduler().cancelTask(textTask);
 
@@ -243,26 +254,18 @@ public class PlayerBoard {
             Bukkit.getScheduler().cancelTask(i);
     }
 
-    public void updater() {
-        titleTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-            public void run() {
-                updateTitle();
-            }
-        }, 0, updateTitle);
+    private void updater() {
+        titleTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, this::updateTitle, 0, updateTitle);
 
-        textTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-            public void run() {
-                updateText();
-            }
-        }, 0, updateText);
+        textTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, this::updateText, 0, updateText);
 
         if (info != null) {
-            for (final String s : info.getChangeText().keySet()) {
-                int inter = info.getChangeTextInterval().get(s);
+            for (final String s : info.getChangeables()) {
+                int inter = info.getChangeableInterval(s);
 
                 BukkitTask task = new BukkitRunnable() {
                     public void run() {
-                        List<String> text = info.getChangeText().get(s);
+                        List<String> text = info.getChangeableText(s);
                         chanTextInt.put(s, chanTextInt.get(s) + 1);
 
                         if (chanTextInt.get(s) >= text.size()) {
@@ -277,16 +280,18 @@ public class PlayerBoard {
                 tasks.add(task.getTaskId());
             }
 
-            for (final String s : info.getScrollerText().keySet()) {
-                int inter = info.getScrollerInterval().get(s);
+            for (final String s : info.getScrollerNames()) {
+                int inter = info.getScrollerUpdate(s);
 
                 BukkitTask task = new BukkitRunnable() {
                     public void run() {
-                        Scroller text = info.getScrollerText().get(s);
-                        String txt = text.text;
-                        text.setupText(setHolders(txt), text.width, text.spaceBetween, '&');
-                        scrollerText.put(s, text.next());
-                        updateText();
+                    Scroller text = info.getScroller(s);
+                    text.setupText(
+                        setHolders(text.text),
+                        '&'
+                    );
+                    scrollerText.put(s, text.next());
+                    updateText();
                     }
                 }.runTaskTimer(plugin, 1, inter);
 
@@ -295,7 +300,12 @@ public class PlayerBoard {
         }
     }
 
-    public void createNew(List<String> text, List<String> title, int updateTitle, int updateText) {
+    public void createNew(
+        List<String> text,
+        List<String> title,
+        int updateTitle,
+        int updateText
+    ) {
         ch = true;
         stopTasks();
         removeAll();
@@ -304,17 +314,19 @@ public class PlayerBoard {
         this.title = title;
         this.updateText = updateText;
         this.updateTitle = updateTitle;
-        titleindex = this.title.size();
+        titleIndex = this.title.size();
 
         score = board.getObjective("score");
 
-        score.setDisplaySlot(DisplaySlot.SIDEBAR);
+        if (score != null)
+        {
+            score.setDisplaySlot(DisplaySlot.SIDEBAR);
+            score.setDisplayName(this.title.get(0));
+        }
 
         if (this.title.size() <= 0) {
             this.title.add(" ");
         }
-
-        score.setDisplayName(this.title.get(0));
 
         setUpText(text);
 
@@ -325,7 +337,7 @@ public class PlayerBoard {
     private void removeAll() {
         chlist.clear();
         score = null;
-        titleindex = 0;
+        titleIndex = 0;
         index = 15;
         lot.clear();
         teams.clear();
@@ -339,7 +351,14 @@ public class PlayerBoard {
         }
     }
 
-    private String getResult(boolean BOLD, boolean ITALIC, boolean MAGIC, boolean STRIKETHROUGH, boolean UNDERLINE, ChatColor color) {
+    private String getResult(
+        boolean BOLD,
+        boolean ITALIC,
+        boolean MAGIC,
+        boolean STRIKETHROUGH,
+        boolean UNDERLINE,
+        ChatColor color
+    ) {
         return ((color != null) && (!color.equals(ChatColor.WHITE)) ? color : "") + "" + (BOLD ? ChatColor.BOLD : "") + (ITALIC ? ChatColor.ITALIC : "") + (MAGIC ? ChatColor.MAGIC : "") + (STRIKETHROUGH ? ChatColor.STRIKETHROUGH : "") + (UNDERLINE ? ChatColor.UNDERLINE : "");
     }
 
@@ -363,7 +382,7 @@ public class PlayerBoard {
                     if (color.equals(ChatColor.RESET)) {
                         break;
                     }
-                    if ((textColor == null) && (color.isFormat())) {
+                    if (color.isFormat()) {
                         if ((color.equals(ChatColor.BOLD)) && (!BOLD)) {
                             BOLD = true;
                         } else if ((color.equals(ChatColor.ITALIC)) && (!ITALIC)) {
@@ -375,7 +394,7 @@ public class PlayerBoard {
                         } else if ((color.equals(ChatColor.UNDERLINE)) && (!UNDERLINE)) {
                             UNDERLINE = true;
                         }
-                    } else if ((textColor == null) && (color.isColor())) {
+                    } else if (color.isColor()) {
                         textColor = color;
                     }
                 }
@@ -400,10 +419,11 @@ public class PlayerBoard {
         return new String[]{prefix.toString().length() > getMaxSize() ? prefix.toString().substring(0, getMaxSize()) : prefix.toString(), suffix.toString().length() > getMaxSize() ? suffix.toString().substring(0, getMaxSize()) : suffix.toString()};
     }
 
-    public Scoreboard getBoard() {
+    Scoreboard getBoard() {
         return board;
     }
 
+    @SuppressWarnings("unused")
     public Objective getScore() {
         return score;
     }
@@ -412,10 +432,12 @@ public class PlayerBoard {
         return player;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public List<String> getList() {
         return list;
     }
 
+    @SuppressWarnings("unused")
     public List<String> getTitle() {
         return title;
     }
