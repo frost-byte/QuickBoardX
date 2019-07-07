@@ -23,9 +23,12 @@ public class PlayerBoard {
     private QuickBoard plugin;
 
     private Scoreboard board;
+    private PlayerBoard currentBoard;
+    private String currentBoardName;
     private Objective score;
     private Player player;
-
+    @SuppressWarnings("WeakerAccess")
+    public static final int BOARD_TEMP_LIFETIME = 20 * 20;
     private List<Team> teams = new ArrayList<>();
     private HashMap<Team, String> lot = new HashMap<>();
     private List<String> list;
@@ -35,6 +38,7 @@ public class PlayerBoard {
     private int updateText;
     private int titleTask;
     private int textTask;
+    private int tempTask;
     private boolean ch = false;
     private BoardConfig info = null;
     private HashMap<String, String> chanText = new HashMap<>();
@@ -42,17 +46,33 @@ public class PlayerBoard {
     private HashMap<String, String> scrollerText = new HashMap<>();
     private List<Integer> tasks = new ArrayList<>();
     private boolean ver13 = false;
-
+    private boolean isTemporary;
     private int index = 15;
     private int titleIndex = 0;
 
     public PlayerBoard(QuickBoard plugin, Player player, BoardConfig info) {
+        this(plugin, player, info, false);
+    }
+
+    PlayerBoard(
+        QuickBoard plugin,
+        Player player,
+        BoardConfig info,
+        boolean isTemporary
+    ){
         this.plugin = plugin;
         this.player = player;
+        this.isTemporary = isTemporary;
         list = info.getText();
         title = info.getTitle();
         updateTitle = info.getUpdaterTitle();
         updateText = info.getUpdaterText();
+
+        if(isTemporary) {
+            currentBoard = plugin.getBoards().getOrDefault(player, null);
+            if (currentBoard != null)
+                currentBoardName = currentBoard.info.getPermission();
+        }
 
         List<String> changeKeys = info.getChangeables();
         for (String s : changeKeys) {
@@ -77,13 +97,34 @@ public class PlayerBoard {
         int updateTitle,
         int updateText
     ) {
+        this(plugin, player, text, title, updateTitle, updateText, false);
+    }
+
+    PlayerBoard(
+        QuickBoard plugin,
+        Player player,
+        List<String> text,
+        List<String> title,
+        int updateTitle,
+        int updateText,
+        boolean isTemporary
+    ) {
         this.plugin = plugin;
         this.player = player;
         this.updateTitle = updateTitle;
         this.updateText = updateText;
-
+        this.isTemporary = isTemporary;
         this.title = title;
         this.list = text;
+
+        if(isTemporary) {
+            currentBoard = plugin.getBoards().getOrDefault(player, null);
+            if (currentBoard != null)
+            {
+                if (currentBoard.info != null)
+                    currentBoardName = currentBoard.info.getPermission();
+            }
+        }
 
         PlayerReceiveBoardEvent event = new PlayerReceiveBoardEvent(getPlayer(), this.list, this.title, this);
         Bukkit.getPluginManager().callEvent(event);
@@ -119,6 +160,13 @@ public class PlayerBoard {
             event.getTitle().add(" ");
 
         getPlayer().setScoreboard(board);
+    }
+
+    public String getBoardName() {
+        if (info != null) {
+            return info.getPermission();
+        }
+        return null;
     }
 
     private void setUpText(final List<String> text) {
@@ -222,6 +270,27 @@ public class PlayerBoard {
         return 16;
     }
 
+    private void removeTemporary() {
+        if (isTemporary && currentBoardName != null) {
+            if (plugin.getInfo().containsKey(currentBoardName)) {
+                BoardConfig in = plugin.getInfo().get(currentBoardName);
+                plugin.getLogger().info(
+                    "Restoring Board " + currentBoardName + " for " + player.getName()
+                );
+                isTemporary = false;
+                new PlayerBoard(plugin, player, in);
+//                plugin.getBoards()
+//                    .get(player)
+//                    .createNew(
+//                        in.getText(),
+//                        in.getTitle(),
+//                        in.getUpdaterTitle(),
+//                        in.getUpdaterText()
+//                    );
+            }
+        }
+    }
+
     void updateTitle() {
         if (ch) {
             return;
@@ -249,6 +318,7 @@ public class PlayerBoard {
     void stopTasks() {
         Bukkit.getScheduler().cancelTask(titleTask);
         Bukkit.getScheduler().cancelTask(textTask);
+        Bukkit.getScheduler().cancelTask(tempTask);
 
         for (int i : tasks)
             Bukkit.getScheduler().cancelTask(i);
@@ -256,8 +326,15 @@ public class PlayerBoard {
 
     private void updater() {
         titleTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, this::updateTitle, 0, updateTitle);
-
         textTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, this::updateText, 0, updateText);
+
+        if (isTemporary) {
+            tempTask = Bukkit.getScheduler().scheduleSyncDelayedTask(
+                plugin,
+                this::removeTemporary,
+                BOARD_TEMP_LIFETIME
+            );
+        }
 
         if (info != null) {
             for (final String s : info.getChangeables()) {
@@ -298,6 +375,43 @@ public class PlayerBoard {
                 tasks.add(task.getTaskId());
             }
         }
+    }
+
+    @SuppressWarnings("WeakerAccess")
+	public void createNew(BoardConfig info) {
+        ch = true;
+        stopTasks();
+        removeAll();
+        colorize();
+        this.info = info;
+        this.list = info.getText();
+        this.title = info.getTitle();
+        this.updateText = info.getUpdaterText();
+        this.updateTitle = info.getUpdaterTitle();
+        titleIndex = this.title.size();
+
+        score = board.getObjective("score");
+
+        if (score != null)
+        {
+            score.setDisplaySlot(DisplaySlot.SIDEBAR);
+            score.setDisplayName(this.title.get(0));
+        }
+
+        if (this.title.size() <= 0) {
+            this.title.add(" ");
+        }
+
+        List<String> changeKeys = info.getChangeables();
+        for (String s : changeKeys) {
+            chanTextInt.put(s, 0);
+            chanText.put(s, info.getChangeableText(s).get(0));
+        }
+
+        setUpText(info.getText());
+
+        ch = false;
+        updater();
     }
 
     public void createNew(

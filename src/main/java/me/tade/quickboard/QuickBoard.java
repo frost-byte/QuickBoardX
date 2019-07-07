@@ -231,6 +231,18 @@ public class QuickBoard extends JavaPlugin implements Listener, QuickBoardAPI
 		}.runTaskTimer(this, 0, 20);
 	}
 
+	private List<String> getBoardsForPlayer(Player p) {
+		List<String> usableBoards = new ArrayList<>();
+
+		Set<String> perms = info.keySet();
+		perms.forEach(s -> {
+			Boolean hasPermission = p.hasPermission(s);
+			usableBoards.add(s);
+		});
+
+		return usableBoards;
+	}
+
 	/**
 	 * Register Console and Player Commands with ACF
 	 */
@@ -365,20 +377,27 @@ public class QuickBoard extends JavaPlugin implements Listener, QuickBoardAPI
 
 	public void createDefaultScoreboard(Player player)
 	{
+		getLogger().info("createDefaultScoreboard for " + player.getName());
 		for (String s : info.keySet())
 		{
+			getLogger().info("createDefaultScoreboard named " + s);
 			BoardConfig in = info.get(s);
 			if (in.getEnabledWorlds() != null && in.getEnabledWorlds().contains(player.getWorld().getName()))
 			{
+				getLogger().info("createDefaultScoreboard in world " + player.getWorld().getName());
 				if (player.hasPermission(s))
 				{
+					getLogger().info("createDefaultScoreboard has scoreboard permission");
 					if (boards.containsKey(player))
 					{
+						getLogger().info("createDefaultScoreboard named " + s + " was found for " + player.getName());
 						if (boards.get(player).getList().equals(in.getText()))
 						{
+							getLogger().info("createDefaultScoreboard using existing board");
 							player.setScoreboard(boards.get(player).getBoard());
 							return;
 						}
+						getLogger().info("createDefaultScoreboard creating new board");
 						boards.get(player)
 							.createNew(
 								in.getText(),
@@ -389,12 +408,14 @@ public class QuickBoard extends JavaPlugin implements Listener, QuickBoardAPI
 					}
 					else
 					{
+						getLogger().info("createDefaultScoreboard board generated for player " + player.getName());
 						new PlayerBoard(this, player, info.get(s));
 					}
 					return;
 				}
 			}
 		}
+		getLogger().info("createDefaultScoreboard could not create a board for player " + player.getName());
 	}
 
 
@@ -509,12 +530,75 @@ public class QuickBoard extends JavaPlugin implements Listener, QuickBoardAPI
 		}.runTaskLater(this, 20);
 	}
 
+	public void nextBoard(Player p) {
+		if (getBoards().containsKey(p)) {
+			List<String> usableBoards = getBoardsForPlayer(p);
+			String currentBoard = getBoards().get(p).getBoardName();
+
+			if(!currentBoard.isEmpty()) {
+				int newIndex;
+				for (int i = 0; i < usableBoards.size(); i++) {
+					String boardName = usableBoards.get(i);
+					if (boardName.equals(currentBoard)) {
+						newIndex = (i + 1) % usableBoards.size();
+						String nextBoardName = usableBoards.get(newIndex);
+						BoardConfig in = getInfo().get(nextBoardName);
+						getBoards().get(p).createNew(in);
+						return;
+					}
+				}
+			}
+		}
+	}
+
+	public void previousBoard(Player p) {
+		if (getBoards().containsKey(p)) {
+			List<String> usableBoards = getBoardsForPlayer(p);
+			String currentBoard = getBoards().get(p).getBoardName();
+
+			if(!currentBoard.isEmpty()) {
+				int newIndex;
+				for (int i = usableBoards.size() - 1; i >= 0; i--) {
+					String boardName = usableBoards.get(i);
+					if (boardName.equals(currentBoard)) {
+						newIndex = Math.abs(i - 1) % usableBoards.size();
+						String nextBoardName = usableBoards.get(newIndex);
+						BoardConfig in = getInfo().get(nextBoardName);
+						getBoards().get(p).createNew(in);
+						return;
+					}
+				}
+			}
+		}
+	}
+
 	@Override
 	public PlayerBoard createBoard(Player player, String name) {
+		getLogger().info("Creating Board " + name + " for " + player.getName());
 		if (getInfo().containsKey(name)) {
 			return new PlayerBoard(this, player, getInfo().get(name));
 		}
 		return null;
+	}
+
+	@Override
+	public PlayerBoard createTemporaryBoard(Player player, String name)
+	{
+		if (getInfo().containsKey(name)) {
+			return new PlayerBoard(this, player, getInfo().get(name), true);
+		}
+		return null;
+	}
+
+	@Override
+	public PlayerBoard createTemporaryBoard(
+		Player player,
+		List<String> text,
+		List<String> title,
+		int updateTitle,
+		int updateText
+	){
+		return new PlayerBoard(this, player, text, title, updateTitle, updateText, true);
 	}
 
 	@Override

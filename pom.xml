@@ -24,37 +24,10 @@
     </properties>
 
     <repositories>
-        <!-- bStats -->
+        <!-- frost-byte -->
         <repository>
-            <id>CodeMC</id>
-            <url>https://repo.codemc.org/repository/maven-public</url>
-        </repository>
-
-        <repository>
-            <id>mvdw-software</id>
-            <name>MVdW Public Repositories</name>
-            <url>http://repo.mvdw-software.be/content/groups/public/</url>
-        </repository>
-
-        <repository>
-            <id>placeholderapi</id>
-            <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
-        </repository>
-
-        <repository>
-            <id>papermc</id>
-            <url>https://papermc.io/repo/repository/maven-public/</url>
-        </repository>
-
-        <!-- ACF -->
-        <repository>
-            <id>aikar</id>
-            <url>https://repo.aikar.co/content/groups/aikar/</url>
-        </repository>
-
-        <repository>
-            <id>sonatype</id>
-            <url>https://oss.sonatype.org/content/repositories/releases</url>
+            <id>frost-byte</id>
+            <url>https://frost-byte.net/nexus/repository/maven-public/</url>
         </repository>
     </repositories>
     <dependencies>
@@ -215,6 +188,33 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- maven-deploy-plugin -->
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8.2</version>
+                <executions>
+                    <execution>
+                        <id>default-deploy</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
+    <distributionManagement>
+        <downloadUrl>https://frost-byte.net/nexus/repository/maven-public/</downloadUrl>
+        <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <name>frost-byte Snapshots</name>
+            <url>https://frost-byte.net/nexus/repository/maven-snapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <id>nexus-releases</id>
+            <name>frost-byte Releases</name>
+            <url>https://frost-byte.net/nexus/repository/maven-releases/</url>
+        </repository>
+    </distributionManagement>
 </project>

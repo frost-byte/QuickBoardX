@@ -59,7 +59,6 @@ public class MainCommand extends BaseCommand
 	@CommandPermission("quickboard.toggle")
 	public void toggle(Player p)
 	{
-
 		String text;
 
 		if (plugin.getBoards().containsKey(p))
@@ -75,6 +74,44 @@ public class MainCommand extends BaseCommand
 
 		if (text != null)
 			p.sendMessage(text.replace("&", "§"));
+	}
+
+	@Description("Switch to the next available scoreboard.")
+	@Subcommand("next")
+	@CommandPermission("quickboard.toggle")
+	public void next(Player p)
+	{
+		String text;
+		if (plugin.getBoards().containsKey(p))
+		{
+			plugin.nextBoard(p);
+			text = HEADER + " switched to " + plugin.getBoards().get(p).getBoardName();
+		}
+		else
+		{
+			text = HEADER + " could not select next scoreboard!";
+		}
+
+		p.sendMessage(text.replace("&", "§"));
+	}
+
+	@Description("Switch to the next available scoreboard.")
+	@Subcommand("prev")
+	@CommandPermission("quickboard.toggle")
+	public void previous(Player p)
+	{
+		String text;
+		if (plugin.getBoards().containsKey(p))
+		{
+			plugin.previousBoard(p);
+			text = HEADER + " switched to " + plugin.getBoards().get(p).getBoardName();
+		}
+		else
+		{
+			text = HEADER + " could not select previous scoreboard!";
+		}
+
+		p.sendMessage(text.replace("&", "§"));
 	}
 
 	@Description("Enable your scoreboard.")
