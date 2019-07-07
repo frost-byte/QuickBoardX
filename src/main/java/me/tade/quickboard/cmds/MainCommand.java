@@ -32,6 +32,7 @@ public class MainCommand extends BaseCommand
 	private static final String ERROR_FAILED = HEADER + "§cOperation failed!";
 	private static final String ERROR_FILE_CREATION = HEADER + "§cAn error occurred while creating the file!";
 	private static final String ERROR_INVALID_NUMBER = HEADER + "§cThis number is not valid! Use 1, 2, 3, ...";
+	private static final String ERROR_NO_PERMISSION = HEADER + "§cYou do not have permission to use that scoreboard!";
 	private static final String INSERTED_EMPTY_LINE = HEADER + "§aInserted empty line!";
 	private static final String INSERTED_LINE = HEADER + "§aInserted '%s' into line!";
 	private static final String LINE_REMOVED = HEADER + "§aLine removed!";
@@ -76,7 +77,7 @@ public class MainCommand extends BaseCommand
 			p.sendMessage(text.replace("&", "§"));
 	}
 
-	@Description("Switch to the next available scoreboard.")
+	@Description("Select the next available scoreboard from the list of accessible boards.")
 	@Subcommand("next")
 	@CommandPermission("quickboard.toggle")
 	public void next(Player p)
@@ -95,7 +96,7 @@ public class MainCommand extends BaseCommand
 		p.sendMessage(text.replace("&", "§"));
 	}
 
-	@Description("Switch to the next available scoreboard.")
+	@Description("Select the previous scoreboard from the list of accessible boards.")
 	@Subcommand("prev")
 	@CommandPermission("quickboard.toggle")
 	public void previous(Player p)
@@ -215,16 +216,42 @@ public class MainCommand extends BaseCommand
 			BoardConfig in = plugin.getInfo().get(permission);
 			plugin.getBoards()
 				.get(player)
-				.createNew(
-					in.getText(),
-					in.getTitle(),
-					in.getUpdaterTitle(),
-					in.getUpdaterText()
-				);
+				.createNew(in);
 		}
 		else
 		{
 			new PlayerBoard(plugin, player, plugin.getInfo().get(permission));
+		}
+	}
+
+	@Description("Switch to the selected scoreboard from the list of accessible boards.")
+	@Syntax("<name>")
+	@Subcommand("select|sl")
+	@CommandPermission("quickboard.select")
+	@CommandCompletion("@boards")
+	public void toggleCustom(
+		Player sender,
+		@Values("@boards") String permission
+	){
+		if (!plugin.getInfo().containsKey(permission))
+		{
+			sender.sendMessage(ERROR_DOES_NOT_EXIST);
+			return;
+		}
+
+		if (plugin.getBoards().containsKey(sender))
+		{
+			if (!sender.hasPermission(permission)) {
+				sender.sendMessage(ERROR_FAILED);
+			}
+			BoardConfig in = plugin.getInfo().get(permission);
+			plugin.getBoards()
+				.get(sender)
+				.createNew(in);
+		}
+		else
+		{
+			new PlayerBoard(plugin, sender, plugin.getInfo().get(permission));
 		}
 	}
 
