@@ -75,9 +75,11 @@ public class PlayerBoard {
         }
 
         List<String> changeKeys = info.getChangeables();
-        for (String s : changeKeys) {
-            chanTextInt.put(s, 0);
-            chanText.put(s, info.getChangeableText(s).get(0));
+        if (changeKeys != null) {
+            for (String s : changeKeys) {
+                chanTextInt.put(s, 0);
+                chanText.put(s, info.getChangeableText(s).get(0));
+            }
         }
 
         this.info = info;
@@ -209,20 +211,24 @@ public class PlayerBoard {
             String s = lot.get(t);
             if (info != null)
             {
-                for (String a : info.getChangeables())
-                {
-                    if (s.contains("{CH_" + a + "}"))
+                if (info.getChangeables() != null) {
+                    for (String a : info.getChangeables())
                     {
-                        s = s.replace("{CH_" + a + "}", "");
-                        s = s + chanText.get(a);
+                        if (s.contains("{CH_" + a + "}"))
+                        {
+                            s = s.replace("{CH_" + a + "}", "");
+                            s = s + chanText.get(a);
+                        }
                     }
                 }
-                for (String a : info.getScrollerNames())
-                {
-                    if (s.contains("{SC_" + a + "}"))
+                if (info.getScrollerNames() != null) {
+                    for (String a : info.getScrollerNames())
                     {
-                        s = s.replace("{SC_" + a + "}", "");
-                        s = s + scrollerText.get(a);
+                        if (s.contains("{SC_" + a + "}"))
+                        {
+                            s = s.replace("{SC_" + a + "}", "");
+                            s = s + scrollerText.get(a);
+                        }
                     }
                 }
             }
@@ -279,14 +285,6 @@ public class PlayerBoard {
                 );
                 isTemporary = false;
                 new PlayerBoard(plugin, player, in);
-//                plugin.getBoards()
-//                    .get(player)
-//                    .createNew(
-//                        in.getText(),
-//                        in.getTitle(),
-//                        in.getUpdaterTitle(),
-//                        in.getUpdaterText()
-//                    );
             }
         }
     }
@@ -337,48 +335,60 @@ public class PlayerBoard {
         }
 
         if (info != null) {
-            for (final String s : info.getChangeables()) {
-                int inter = info.getChangeableInterval(s);
+            if (info.getChangeables() != null)
+            {
+                for (final String s : info.getChangeables())
+                {
+                    int inter = info.getChangeableInterval(s);
 
-                BukkitTask task = new BukkitRunnable() {
-                    public void run() {
-                        List<String> text = info.getChangeableText(s);
-                        chanTextInt.put(s, chanTextInt.get(s) + 1);
+                    BukkitTask task = new BukkitRunnable()
+                    {
+                        public void run()
+                        {
+                            List<String> text = info.getChangeableText(s);
+                            chanTextInt.put(s, chanTextInt.get(s) + 1);
 
-                        if (chanTextInt.get(s) >= text.size()) {
-                            chanTextInt.put(s, 0);
+                            if (chanTextInt.get(s) >= text.size())
+                            {
+                                chanTextInt.put(s, 0);
+                            }
+                            int ta = chanTextInt.get(s);
+                            chanText.put(s, text.get(ta));
+                            updateText();
                         }
-                        int ta = chanTextInt.get(s);
-                        chanText.put(s, text.get(ta));
-                        updateText();
-                    }
-                }.runTaskTimer(plugin, 1, inter);
+                    }.runTaskTimer(plugin, 1, inter);
 
-                tasks.add(task.getTaskId());
+                    tasks.add(task.getTaskId());
+                }
             }
 
-            for (final String s : info.getScrollerNames()) {
-                int inter = info.getScrollerUpdate(s);
+            if (info.getScrollerNames() != null)
+            {
+                for (final String s : info.getScrollerNames())
+                {
+                    int inter = info.getScrollerUpdate(s);
 
-                BukkitTask task = new BukkitRunnable() {
-                    public void run() {
-                    Scroller text = info.getScroller(s);
-                    text.setupText(
-                        setHolders(text.text),
-                        '&'
-                    );
-                    scrollerText.put(s, text.next());
-                    updateText();
-                    }
-                }.runTaskTimer(plugin, 1, inter);
+                    BukkitTask task = new BukkitRunnable()
+                    {
+                        public void run()
+                        {
+                            Scroller text = info.getScroller(s);
+                            text.setupText(
+                                setHolders(text.text),
+                                '&'
+                            );
+                            scrollerText.put(s, text.next());
+                            updateText();
+                        }
+                    }.runTaskTimer(plugin, 1, inter);
 
-                tasks.add(task.getTaskId());
+                    tasks.add(task.getTaskId());
+                }
             }
         }
     }
 
-    @SuppressWarnings("WeakerAccess")
-	public void createNew(BoardConfig info) {
+    public void createNew(BoardConfig info) {
         ch = true;
         stopTasks();
         removeAll();
@@ -403,46 +413,16 @@ public class PlayerBoard {
         }
 
         List<String> changeKeys = info.getChangeables();
-        for (String s : changeKeys) {
-            chanTextInt.put(s, 0);
-            chanText.put(s, info.getChangeableText(s).get(0));
+        if (changeKeys != null)
+        {
+            for (String s : changeKeys)
+            {
+                chanTextInt.put(s, 0);
+                chanText.put(s, info.getChangeableText(s).get(0));
+            }
         }
 
         setUpText(info.getText());
-
-        ch = false;
-        updater();
-    }
-
-    public void createNew(
-        List<String> text,
-        List<String> title,
-        int updateTitle,
-        int updateText
-    ) {
-        ch = true;
-        stopTasks();
-        removeAll();
-        colorize();
-        this.list = text;
-        this.title = title;
-        this.updateText = updateText;
-        this.updateTitle = updateTitle;
-        titleIndex = this.title.size();
-
-        score = board.getObjective("score");
-
-        if (score != null)
-        {
-            score.setDisplaySlot(DisplaySlot.SIDEBAR);
-            score.setDisplayName(this.title.get(0));
-        }
-
-        if (this.title.size() <= 0) {
-            this.title.add(" ");
-        }
-
-        setUpText(text);
 
         ch = false;
         updater();

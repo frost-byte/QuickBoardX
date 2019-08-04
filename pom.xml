@@ -18,7 +18,7 @@
         <guice.version>4.2.0</guice.version>
         <placeholder.version>2.10.3</placeholder.version>
         <mvdw.version>3.0.0-SNAPSHOT</mvdw.version>
-        <paper.version>1.14.3-R0.1-SNAPSHOT</paper.version>
+        <paper.version>1.14.4-R0.1-SNAPSHOT</paper.version>
         <reflections.version>0.9.11</reflections.version>
         <json.version>20180813</json.version>
     </properties>

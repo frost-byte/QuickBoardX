@@ -380,31 +380,21 @@ public class QuickBoard extends JavaPlugin implements Listener, QuickBoardAPI
 		getLogger().info("createDefaultScoreboard for " + player.getName());
 		for (String s : info.keySet())
 		{
-			getLogger().info("createDefaultScoreboard named " + s);
 			BoardConfig in = info.get(s);
 			if (in.getEnabledWorlds() != null && in.getEnabledWorlds().contains(player.getWorld().getName()))
 			{
-				getLogger().info("createDefaultScoreboard in world " + player.getWorld().getName());
 				if (player.hasPermission(s))
 				{
-					getLogger().info("createDefaultScoreboard has scoreboard permission");
 					if (boards.containsKey(player))
 					{
 						getLogger().info("createDefaultScoreboard named " + s + " was found for " + player.getName());
 						if (boards.get(player).getList().equals(in.getText()))
 						{
-							getLogger().info("createDefaultScoreboard using existing board");
 							player.setScoreboard(boards.get(player).getBoard());
 							return;
 						}
-						getLogger().info("createDefaultScoreboard creating new board");
 						boards.get(player)
-							.createNew(
-								in.getText(),
-								in.getTitle(),
-								in.getUpdaterTitle(),
-								in.getUpdaterText()
-							);
+							.createNew(in);
 					}
 					else
 					{

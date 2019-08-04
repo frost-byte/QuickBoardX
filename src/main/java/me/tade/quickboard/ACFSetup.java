@@ -4,9 +4,6 @@ import co.aikar.commands.*;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
-import org.bukkit.command.CommandSender;
 
 import java.util.logging.Logger;
 
@@ -75,58 +72,6 @@ public class ACFSetup
 
 			return number;
 		});
-
-		con.registerContext(
-			World.class,
-			c -> {
-				String worldName = c.popFirstArg();
-				logger.info("ACFSetup.registerContext.World: name: " + worldName);
-				if (worldName == null || worldName.isEmpty())
-				{
-//					worldName = Worlds.Survival.getWorldName();
-				}
-
-				//return worldManager.getWorldByName(worldName);
-				return null;
-			}
-		);
-
-		// Converts a string representing the name of an player that is offline
-		// into an OfflinePlayer instance
-		con.registerContext(OfflinePlayer.class, c -> {
-			OfflinePlayer playerTarget;
-			CommandSender sender = c.getSender();
-
-			if (c.hasFlag("other"))
-			{
-				String rawUsername = c.popFirstArg();
-
-//				if (playerManager.hasPlayedBefore(rawUsername))
-//				{
-//					playerTarget = playerManager.getOfflinePlayer(rawUsername);
-//				}
-//				else
-//				{
-//					throw new InvalidCommandArgument("That player hasn't joined the server.");
-//				}
-			}
-			else
-			{
-				if (sender instanceof OfflinePlayer)
-				{
-					playerTarget = (OfflinePlayer) sender;
-				}
-				else
-				{
-					throw new InvalidCommandArgument("The command executor must be an offline player.");
-				}
-			}
-
-			return null;
-		});
-
-
-
 	}
 
 	/**

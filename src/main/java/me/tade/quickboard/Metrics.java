@@ -942,7 +942,6 @@ public class Metrics {
             data.put("values", values);
             return data;
         }
-
     }
 
     /**
@@ -979,7 +978,6 @@ public class Metrics {
             data.put("value", value.getCountryIsoTag());
             return data;
         }
-
     }
 
     /**
@@ -1030,7 +1028,5 @@ public class Metrics {
             data.put("values", values);
             return data;
         }
-
     }
-
 }
