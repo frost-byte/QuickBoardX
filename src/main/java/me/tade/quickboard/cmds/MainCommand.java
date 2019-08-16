@@ -198,8 +198,8 @@ public class MainCommand extends BaseCommand
 	@Description("Toggle a custom scoreboard for a player using its name (permission).")
 	@Syntax("<Player> <name>")
 	@Subcommand("set|s")
-	@CommandPermission("quickboard.set")
 	@CommandCompletion("@players @boards")
+	@CommandPermission("quickboard.set")
 	public void toggleCustom(
 		CommandSender sender,
 		@Flags("other") Player player,
@@ -227,8 +227,8 @@ public class MainCommand extends BaseCommand
 	@Description("Switch to the selected scoreboard from the list of accessible boards.")
 	@Syntax("<name>")
 	@Subcommand("select|sl")
-	@CommandPermission("quickboard.select")
 	@CommandCompletion("@boards")
+	@CommandPermission("quickboard.select")
 	public void toggleCustom(
 		Player sender,
 		@Values("@boards") String permission
@@ -255,11 +255,12 @@ public class MainCommand extends BaseCommand
 		}
 	}
 
+
 	@Description("Create a scoreboard with the provided name (permission).")
 	@Syntax("<name (permission)>")
 	@Subcommand("create|c")
-	@CommandPermission("quickboard.create")
 	@CommandCompletion("@nothing")
+	@CommandPermission("quickboard.create")
 	public void createScoreboard(Player sender, String name)
 	{
 
@@ -286,11 +287,11 @@ public class MainCommand extends BaseCommand
 		});
 	}
 
-
 	@Description("Add a line to a Scoreboard's Title.")
 	@Subcommand("addtitle|at")
 	@Syntax("<board> <text>")
 	@CommandCompletion("@boards @nothing")
+	@CommandPermission("quickboard.edit")
 	public void addTitle(Player sender, @Values("@boards") String name, @Optional String text)
 	{
 		AtomicBoolean fileExists = new AtomicBoolean(false);
@@ -323,6 +324,7 @@ public class MainCommand extends BaseCommand
 	@Subcommand("removetitle|rt")
 	@Syntax("<board> <line_number>")
 	@CommandCompletion("@boards @range(1-15)")
+	@CommandPermission("quickboard.edit")
 	public void removeTitle(Player sender, @Values("@boards") String name, int lineNum)
 	{
 		if (lineNum <= 0)
@@ -359,6 +361,7 @@ public class MainCommand extends BaseCommand
 	@Subcommand("inserttitle|it")
 	@Syntax("<board> <line_number> <text>")
 	@CommandCompletion("@boards @range(1-15) @nothing")
+	@CommandPermission("quickboard.edit")
 	public void insertTitle(Player sender, @Values("@boards") String name, int lineNum, @Optional String text)
 	{
 		if (lineNum <= 0)
@@ -416,6 +419,7 @@ public class MainCommand extends BaseCommand
 	@Subcommand("addline|al")
 	@Syntax("<board> <text>")
 	@CommandCompletion("@boards @nothing")
+	@CommandPermission("quickboard.edit")
 	public void addLine(Player sender, @Values("@boards") String name, @Optional String text)
 	{
 		AtomicBoolean fileExists = new AtomicBoolean(false);
@@ -450,6 +454,7 @@ public class MainCommand extends BaseCommand
 	@Subcommand("removeline|rmln|rl")
 	@Syntax("<board> <line_number>")
 	@CommandCompletion("@boards @range(1-15)")
+	@CommandPermission("quickboard.edit")
 	public void removeLine(Player sender, @Values("@boards") String name, int lineNum)
 	{
 		if (lineNum <= 0)
@@ -488,6 +493,7 @@ public class MainCommand extends BaseCommand
 	@Subcommand("insertline|il")
 	@Syntax("<board> <line_number> <text>")
 	@CommandCompletion("@boards @range(1-15) @nothing")
+	@CommandPermission("quickboard.edit")
 	public void insertLine(Player sender, @Values("@boards") String name, int lineNum, @Optional String text)
 	{
 		if (lineNum <= 0)

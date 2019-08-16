@@ -342,9 +342,13 @@ public class QuickBoard extends JavaPlugin implements Listener, QuickBoardAPI
 	public void onTeleport(PlayerTeleportEvent e)
 	{
 		final Player p = e.getPlayer();
+		String fromWorld = e.getFrom().getWorld().getName();
+		String toWorld = e.getTo().getWorld().getName();
 
-		if (!e.getFrom().getWorld().getName().equals(e.getTo().getWorld().getName()))
+		if (!fromWorld.equalsIgnoreCase(toWorld))
+		{
 			playerWorldTimer.put(p, System.currentTimeMillis() + 3000);
+		}
 	}
 
 	@SuppressWarnings("unused")
@@ -352,7 +356,6 @@ public class QuickBoard extends JavaPlugin implements Listener, QuickBoardAPI
 	public void onRespawn(PlayerRespawnEvent e)
 	{
 		final Player p = e.getPlayer();
-
 		playerWorldTimer.put(p, System.currentTimeMillis() + 3000);
 	}
 
@@ -381,8 +384,12 @@ public class QuickBoard extends JavaPlugin implements Listener, QuickBoardAPI
 		for (String s : info.keySet())
 		{
 			BoardConfig in = info.get(s);
-			if (in.getEnabledWorlds() != null && in.getEnabledWorlds().contains(player.getWorld().getName()))
-			{
+			String playerWorld = player.getWorld().getName();
+
+			if (
+				in.getEnabledWorlds() != null &&
+				in.getEnabledWorlds().contains(playerWorld)
+			) {
 				if (player.hasPermission(s))
 				{
 					if (boards.containsKey(player))
@@ -404,6 +411,11 @@ public class QuickBoard extends JavaPlugin implements Listener, QuickBoardAPI
 					return;
 				}
 			}
+		}
+		PlayerBoard board = boards.getOrDefault(player, null);
+		if (board != null)
+		{
+			board.remove();
 		}
 		getLogger().info("createDefaultScoreboard could not create a board for player " + player.getName());
 	}
