@@ -1,6 +1,0 @@
-name: QuickBoard
-author: The_TadeSK
-version: 4.3.0-SNAPSHOT
-main: me.tade.quickboard.QuickBoard
-softdepend: [PlaceholderAPI, MVdWPlaceholders]
-api-version: 1.14

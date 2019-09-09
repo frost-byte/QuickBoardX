@@ -1,2 +1,24 @@
+# Eclipse
+.classpath
+.project
+.settings/
+ 
+# Intellij
 .idea/
 *.iml
+*.iws
+ 
+# Mac
+.DS_Store
+ 
+# Maven
+log/
+target/
+/Quickboard_1_8_R3/target/
+/Quickboard_1_8_R3/test-server/plugins/
+/Quickboard_1_12_R1/test-server/plugins/
+/Quickboard_1_14_R1/test-server/plugins/
+/quickboard-core/test-server/plugins/
+/test-server/plugins/
+dependency-reduced-pom.xml
+/Quickboard_1_8_R3/dependency-reduced-pom.xml
