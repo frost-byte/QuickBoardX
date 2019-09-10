@@ -3,12 +3,12 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>quickboard-dist</artifactId>
+    <artifactId>quickboardx-dist</artifactId>
 
     <parent>
-        <groupId>me.tade.quickboard</groupId>
-        <artifactId>quickboard-parent</artifactId>
-        <version>4.3.1-SNAPSHOT</version>
+        <groupId>net.frostbyte.quickboardx</groupId>
+        <artifactId>quickboardx-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
 
     <build>
@@ -36,7 +36,7 @@
                             </filters>
                             <artifactSet>
                                 <includes>
-                                    <include>me.tade.quickboard:quickboard-*</include>
+                                    <include>net.frostbyte.quickboardx:quickboardx-*</include>
                                 </includes>
                             </artifactSet>
                         </configuration>
@@ -63,28 +63,28 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>quickboard-core</artifactId>
+            <artifactId>quickboardx-core</artifactId>
             <version>${project.parent.version}</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>quickboard-1_8_R3</artifactId>
+            <artifactId>quickboardx-1_8_R3</artifactId>
             <version>${project.parent.version}</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>quickboard-1_12_R1</artifactId>
+            <artifactId>quickboardx-1_12_R1</artifactId>
             <version>${project.parent.version}</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>quickboard-1_14_R1</artifactId>
+            <artifactId>quickboardx-1_14_R1</artifactId>
             <version>${project.parent.version}</version>
             <type>jar</type>
             <scope>compile</scope>

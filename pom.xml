@@ -4,11 +4,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>me.tade.quickboard</groupId>
-    <artifactId>quickboard-parent</artifactId>
+    <groupId>net.frostbyte.quickboardx</groupId>
+    <artifactId>quickboardx-parent</artifactId>
     <packaging>pom</packaging>
-    <version>4.3.1-SNAPSHOT</version>
-    <name>QuickBoard</name>
+    <version>1.0.0-SNAPSHOT</version>
+    <name>QuickBoardX</name>
     <description>A Free Scoreboard Bukkit plugin</description>
 
     <properties>
@@ -16,10 +16,10 @@
     </properties>
 
     <modules>
-        <module>quickboard-core</module>
-        <module>Quickboard_1_8_R3</module>
-        <module>Quickboard_1_12_R1</module>
-        <module>Quickboard_1_14_R1</module>
+        <module>quickboardx-core</module>
+        <module>QuickboardX_1_8_R3</module>
+        <module>QuickboardX_1_12_R1</module>
+        <module>QuickboardX_1_14_R1</module>
         <module>dist</module>
     </modules>
 

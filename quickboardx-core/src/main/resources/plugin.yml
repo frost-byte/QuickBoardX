@@ -1,0 +1,6 @@
+name: QuickBoardX
+author: frost-byte
+version: 1.0.0-SNAPSHOT
+main: net.frostbyte.quickboardx.QuickBoardX
+softdepend: [PlaceholderAPI, MVdWPlaceholders]
+api-version: 1.14
