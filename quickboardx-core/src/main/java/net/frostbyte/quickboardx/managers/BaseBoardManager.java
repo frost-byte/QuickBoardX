@@ -5,9 +5,15 @@ import net.frostbyte.quickboardx.PlayerBoard;
 import net.frostbyte.quickboardx.QuickBoardX;
 import net.frostbyte.quickboardx.config.BoardConfig;
 import net.frostbyte.quickboardx.events.WhenPluginUpdateTextEvent;
+import net.frostbyte.quickboardx.tasks.RemoveTempTask;
+import net.frostbyte.quickboardx.tasks.UpdateChangeableTask;
+import net.frostbyte.quickboardx.tasks.UpdateScrollerTask;
+import net.frostbyte.quickboardx.tasks.UpdateTextTask;
+import net.frostbyte.quickboardx.tasks.UpdateTitleTask;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -15,32 +21,26 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
-import static net.frostbyte.quickboardx.util.StringConstants.ADDED_EMPTY_LINE;
-import static net.frostbyte.quickboardx.util.StringConstants.ADDED_LINE;
-import static net.frostbyte.quickboardx.util.StringConstants.ERROR_ALREADY_USED;
-import static net.frostbyte.quickboardx.util.StringConstants.ERROR_CANNOT_CHANGE;
-import static net.frostbyte.quickboardx.util.StringConstants.ERROR_DOES_NOT_EXIST;
-import static net.frostbyte.quickboardx.util.StringConstants.ERROR_FAILED;
-import static net.frostbyte.quickboardx.util.StringConstants.ERROR_FILE_CREATION;
-import static net.frostbyte.quickboardx.util.StringConstants.ERROR_INVALID_NUMBER;
-import static net.frostbyte.quickboardx.util.StringConstants.HEADER;
-import static net.frostbyte.quickboardx.util.StringConstants.INSERTED_EMPTY_LINE;
-import static net.frostbyte.quickboardx.util.StringConstants.INSERTED_LINE;
-import static net.frostbyte.quickboardx.util.StringConstants.LINE_REMOVED;
-import static net.frostbyte.quickboardx.util.StringConstants.OUT_OF_BOUNDS;
-import static net.frostbyte.quickboardx.util.StringConstants.SCOREBOARD_CHANGED;
+import static net.frostbyte.quickboardx.util.StringConstants.*;
 
 @SuppressWarnings({"unused", "WeakerAccess", "UnusedReturnValue"})
 public abstract class BaseBoardManager
 {
 	protected final QuickBoardX plugin;
 	protected final Logger logger;
+
+	/**
+	 * Player Scoreboard Tasks for updating the Title, Changeable and Scrolling text elements.
+	 * Also includes timers for removing Temporary boards.
+	 */
+	protected Map<UUID, List<Integer>> playerBoardTasks = new HashMap<>();
 
 	/**
 	 * The maximum number of characters that a Team Prefix or Suffix can contain
@@ -149,14 +149,6 @@ public abstract class BaseBoardManager
 	public abstract BaseBoardManager removeAll(PlayerBoard playerBoard);
 
 	/**
-	 * Start the Specified BoardTask
-	 *
-	 * @param task A Board Task for a specific Player Board
-	 * @return The unique id for the created task
-	 */
-	public abstract int startTask(BoardTask task);
-
-	/**
 	 * Get the name of the given player's current world.
 	 *
 	 * @param playerID The player's Unique ID
@@ -201,6 +193,8 @@ public abstract class BaseBoardManager
 		this.logger = plugin.getLogger();
 	}
 
+	protected List<Integer> getTasksList(UUID playerID) { return playerBoardTasks.getOrDefault(playerID, null); }
+
 	/**
 	 * Add a board configuration to the manager.
 	 *
@@ -221,6 +215,53 @@ public abstract class BaseBoardManager
 	 * @return The instance of the BoardManager implementation
 	 */
 	public abstract BaseBoardManager stopTasks(UUID playerID);
+
+	public abstract int scheduleTask(Runnable runnable, BoardOperation operation);
+
+	/**
+	 * Start the Specified BoardTask
+	 *
+	 * @param task A Board Task for a specific Player Board
+	 * @return The unique id for the created task
+	 */
+	public int startTask(BoardTask task)
+	{
+		BoardOperation operation = task.getOperation();
+		UUID playerID = task.getPlayerBoard().getPlayerID();
+		Runnable runnable;
+
+		switch (operation)
+		{
+			case UPDATE_TITLE:
+				runnable = new UpdateTitleTask(task);
+				break;
+			case UPDATE_TEXT:
+				runnable = new UpdateTextTask(task.getPlayerBoard(), this);
+				break;
+			case UPDATE_SCROLLER:
+				runnable = new UpdateScrollerTask(task);
+				break;
+			case UPDATE_CHANGEABLE:
+				runnable = new UpdateChangeableTask(task);
+				break;
+			case REMOVE_TEMPORARY:
+				runnable = new RemoveTempTask(task);
+				break;
+			case UNKNOWN:
+			default:
+				throw new IllegalStateException("Unexpected value: " + operation);
+		}
+		int taskID = scheduleTask(runnable, operation);
+		List<Integer> tasksList = getTasksList(playerID);
+
+		if (tasksList == null)
+			tasksList = new ArrayList<>();
+
+		tasksList.add(taskID);
+		playerBoardTasks.put(playerID, tasksList);
+
+		return taskID;
+	}
 
 	/**
 	 * Update the Scoreboard Text for the given player's
@@ -263,6 +304,63 @@ public abstract class BaseBoardManager
 		return boardConfigMap.getOrDefault(boardName, null);
 	}
 
+	/**
+	 * Retrieve a list of the Enabled Worlds from a scoreboard's configuration.
+	 * @param boardName The name of the scoreboard
+	 * @return A string containing a list of the enabled worlds.
+	 */
+	public String listEnabledWorlds(String boardName)
+	{
+		BoardConfig config = getBoardConfig(boardName);
+		if (config != null)
+		{
+			StringBuilder builder = new StringBuilder();
+			for (String worldName : config.getEnabledWorlds())
+			{
+				builder.append(worldName)
+					.append("\n");
+			}
+			return builder.toString();
+		}
+		else
+			return ERROR_FAILED;
+	}
+
+	public String addEnabledWorld(String boardName, String worldName)
+	{
+		BoardConfig config = getBoardConfig(boardName);
+		if (config != null)
+		{
+			List<String> enabledWorlds = config.getEnabledWorlds();
+			if (!enabledWorlds.contains(worldName))
+			{
+				enabledWorlds.add(worldName);
+				config.setEnabledWorlds(enabledWorlds);
+				return String.format(WORLD_ADDED, worldName);
+			}
+			else
+				return ERROR_WORLD_ALREADY_ENABLED;
+		}
+		return ERROR_FAILED;
+	}
+
+	public String removeEnabledWorld(String boardName, String worldName)
+	{
+		BoardConfig config = getBoardConfig(boardName);
+		if (config != null)
+		{
+			List<String> enabledWorlds = config.getEnabledWorlds();
+			if (!enabledWorlds.contains(worldName))
+			{
+				enabledWorlds.remove(worldName);
+				config.setEnabledWorlds(enabledWorlds);
+				return String.format(WORLD_REMOVED, worldName);
+			}
+			else
+				return ERROR_WORLD_NOT_ENABLED;
+		}
+		return ERROR_FAILED;
+	}
 	/**
 	 * Finds a Board Configuration for the given board name; will load the config, if necessary (and it exists).
 	 *
@@ -993,13 +1091,21 @@ public abstract class BaseBoardManager
 	 */
 	public BaseBoardManager removePlayerBoards()
 	{
-		for (PlayerBoard playerBoard : boards.values())
+		if (boards != null && !boards.isEmpty())
 		{
-			playerBoard.remove();
-			stopTasks(playerBoard.getPlayerID());
+			for (PlayerBoard playerBoard : boards.values())
+			{
+				if (playerBoard != null)
+				{
+					playerBoard.remove();
+					stopTasks(playerBoard.getPlayerID());
+				}
+			}
+			boards.clear();
 		}
-		allBoards.clear();
-		boards.clear();
+
+		if (allBoards != null && !allBoards.isEmpty())
+			allBoards.clear();
 
 		return this;
 	}
@@ -1293,9 +1399,16 @@ public abstract class BaseBoardManager
 					}
 				}
 				textLine = setPlaceholders(textLine, playerID);
-
 				WhenPluginUpdateTextEvent event = new WhenPluginUpdateTextEvent(playerID, textLine);
-				Bukkit.getPluginManager().callEvent(event);
+
+				new BukkitRunnable()
+				{
+					@Override
+					public void run()
+					{
+						Bukkit.getPluginManager().callEvent(event);
+					}
+				}.runTaskLater(plugin, 1);
 
 				BoardLine boardLine = new BoardLine(affixMaxCharacters, event.getText());
 				setTeamText(
@@ -1534,23 +1647,30 @@ public abstract class BaseBoardManager
 	@SuppressWarnings("unused")
 	public enum BoardOperation
 	{
-		UPDATE_TITLE(),
-		UPDATE_TEXT(),
-		UPDATE_SCROLLER(),
-		UPDATE_CHANGEABLE(),
-		REMOVE_TEMPORARY(),
-		UNKNOWN();
+		UPDATE_TITLE(false),
+		UPDATE_TEXT(false),
+		UPDATE_SCROLLER(false),
+		UPDATE_CHANGEABLE(false),
+		REMOVE_TEMPORARY(true),
+		UNKNOWN(false);
 
 		int frequency;
 		int lifetime;
 		int totalElements;
+		boolean runOnce;
 		String key;
 
-		BoardOperation() {
+		BoardOperation(boolean runOnce) {
 			this.lifetime = 0;
 			this.frequency = 0;
 			this.totalElements = 0;
 			this.key = "";
+			this.runOnce = runOnce;
+		}
+
+		public boolean shouldRunOnce()
+		{
+			return runOnce;
 		}
 
 		public int getTotalElements()

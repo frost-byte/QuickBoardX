@@ -51,6 +51,7 @@ text:
 - '&aYour latency'
 - '&7%player_ping%ms'
 - ''
+- '{SC_info}'
 - '&aRunning on &6&lQuickBoardX'
 updater:
   title: 2

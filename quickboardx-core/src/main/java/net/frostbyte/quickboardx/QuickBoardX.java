@@ -633,6 +633,21 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 			.updateText(playerID);
 	}
 
+	public String listEnabledWorlds(String boardName)
+	{
+		return boardManager.listEnabledWorlds(boardName);
+	}
+
+	public String addEnabledWorld(String boardName, String worldName)
+	{
+		return boardManager.addEnabledWorld(boardName, worldName);
+	}
+
+	public String removeEnabledWorld(String boardName, String worldName)
+	{
+		return boardManager.removeEnabledWorld(boardName, worldName);
+	}
+
 	public HashMap<String, BoardConfig> getInfo()
 	{
 		return boardManager.getBoardConfigMap();

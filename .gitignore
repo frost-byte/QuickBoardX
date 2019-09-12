@@ -20,5 +20,10 @@ target/
 /Quickboard_1_14_R1/test-server/plugins/
 /quickboard-core/test-server/plugins/
 /test-server/plugins/
+/test-server
 dependency-reduced-pom.xml
 /Quickboard_1_8_R3/dependency-reduced-pom.xml
+atlassian-ide-plugin.xml
+*/test-server/plugins/**
+/QuickboardX_1_12_R1/test-server/plugins/**
+*.jar

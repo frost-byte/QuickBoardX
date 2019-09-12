@@ -15,6 +15,7 @@ import co.aikar.commands.annotation.Syntax;
 import co.aikar.commands.annotation.Values;
 import net.frostbyte.quickboardx.QuickBoardX;
 import net.frostbyte.quickboardx.util.VersionManager;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -39,7 +40,7 @@ public class BoardCommand extends BaseCommand
 		help.showHelp();
 	}
 
-	@Description("Toggle your scoreboard.")
+	@Description("Toggle your scoreboard's visibility.")
 	@Subcommand("toggle|tog")
 	@CommandPermission("quickboardx.toggle")
 	public void toggle(Player p)
@@ -106,7 +107,7 @@ public class BoardCommand extends BaseCommand
 			p.sendMessage(text);
 	}
 
-	@Description("Switch to a custom scoreboard, for a player, using the board's name (permission).")
+	@Description("Sets the visible scoreboard for a player, using the board's name (permission).")
 	@Syntax("<Player> <name>")
 	@Subcommand("set|s")
 	@CommandCompletion("@players @boards")
@@ -268,12 +269,59 @@ public class BoardCommand extends BaseCommand
 			sender.sendMessage(result);
 	}
 
-	@Description("View all available scoreboards.")
+	@Description("View a list of all available scoreboards.")
 	@Subcommand("list|ls")
-	@CommandPermission("quickboardx.edit")
+	@CommandPermission("quickboardx.info")
 	public void listScoreboards(CommandSender sender)
 	{
 		String result = plugin.listScoreboards();
+
+		if (result != null && !result.isEmpty())
+			sender.sendMessage(result);
+	}
+
+	@Description("List the Enabled Worlds for a Scoreboard.")
+	@Subcommand("listworlds|lsw")
+	@Syntax("<board>")
+	@CommandCompletion("@boards")
+	@CommandPermission("quickboardx.info")
+	public void listWorlds(
+		Player sender,
+		@Values("@boards") String boardName
+	) {
+		String result = plugin.listEnabledWorlds(boardName);
+
+		if (result != null && !result.isEmpty())
+			sender.sendMessage(result);
+	}
+
+	@Description("Add a world to the enabled worlds for a Scoreboard.")
+	@Subcommand("addworld|aw")
+	@Syntax("<board> <world>")
+	@CommandCompletion("@boards @worlds")
+	@CommandPermission("quickboardx.edit")
+	public void addWorld(
+		Player sender,
+		@Values("@boards") String boardName,
+		@Values("@worlds") World world
+	) {
+		String result = plugin.addEnabledWorld(boardName, world.getName());
+
+		if (result != null && !result.isEmpty())
+			sender.sendMessage(result);
+	}
+
+	@Description("Remove a world from the enabled worlds for a Scoreboard.")
+	@Subcommand("remworld|rw")
+	@Syntax("<board> <world>")
+	@CommandCompletion("@boards @worlds")
+	@CommandPermission("quickboardx.edit")
+	public void removeWorld(
+		Player sender,
+		@Values("@boards") String boardName,
+		@Values("@worlds") World world
+	) {
+		String result = plugin.removeEnabledWorld(boardName, world.getName());
 
 		if (result != null && !result.isEmpty())
 			sender.sendMessage(result);

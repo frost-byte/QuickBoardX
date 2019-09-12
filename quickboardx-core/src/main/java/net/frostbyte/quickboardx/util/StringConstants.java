@@ -6,6 +6,8 @@ public class StringConstants
 	public static final String ADDED_EMPTY_LINE = HEADER + "§aAdded empty line!";
 	public static final String ADDED_LINE = HEADER + "§aAdded line '%s'!";
 	public static final String ERROR_ALREADY_USED = HEADER + "§cThis name is already in use!";
+	public static final String ERROR_WORLD_ALREADY_ENABLED = HEADER + "§cThat world is already enabled.";
+	public static final String ERROR_WORLD_NOT_ENABLED = HEADER + "§cThat world was not enabled.";
 	public static final String ERROR_CANNOT_CHANGE = HEADER + "§cCould not change the scoreboard!";
 	public static final String ERROR_DOES_NOT_EXIST = HEADER + "§cScoreboard does not exist!";
 	public static final String ERROR_FAILED = HEADER + "§cOperation failed!";
@@ -15,7 +17,9 @@ public class StringConstants
 	public static final String INSERTED_EMPTY_LINE = HEADER + "§aInserted an empty line!";
 	public static final String INSERTED_LINE = HEADER + "§aInserted '%s' into line!";
 	public static final String LINE_REMOVED = HEADER + "§aLine removed!";
-	public static final String SCOREBOARD_CHANGED = "§aScoreboard changed!";
 	public static final String OUT_OF_BOUNDS = HEADER + "§cYou are out of bounds!";
+	public static final String SCOREBOARD_CHANGED = "§aScoreboard changed!";
+	public static final String WORLD_ADDED = HEADER + "§aAdded '%s' to enabled worlds!";
+	public static final String WORLD_REMOVED = HEADER + "§aRemoved '%s' from enabled worlds!";
 	private StringConstants() {}
 }
