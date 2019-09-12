@@ -307,7 +307,7 @@ public class APIExample extends JavaPlugin {
 [7]: https://www.spigotmc.org/members/tejdik.28526/
 [8]: https://www.spigotmc.org/resources/quickboard-free-scoreboard-plugin-scroller-changeable-text-placeholderapi-anti-flicker.15057/
 [9]: https://discord.gg/MZNYhTA
-[logo]: https://github.com/frost-byte/QuickBoardX/raw/master/images/Layer-QuickBoardX.png
+[logo]: https://github.com/frost-byte/QuickBoardX/blob/master/images/Layer-QuickboardX.png
 
 ### Source Code
 [Github Repository][5]  
