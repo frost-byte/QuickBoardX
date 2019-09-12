@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="20.864285mm"
+   height="20.864285mm"
+   viewBox="0 0 20.864285 20.864285"
+   version="1.1"
+   id="svg8"
+   sodipodi:docname="icon.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   inkscape:export-filename="D:\Minecraft\VanillaEssence\QuickBoardX\images\icon.png"
+   inkscape:export-xdpi="116.86957"
+   inkscape:export-ydpi="116.86957">
+  <defs
+     id="defs2">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient859">
+      <stop
+         style="stop-color:#f4f2e7;stop-opacity:1;"
+         offset="0"
+         id="stop855" />
+      <stop
+         style="stop-color:#f4f2e7;stop-opacity:0;"
+         offset="1"
+         id="stop857" />
+    </linearGradient>
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 148.5 : 1"
+       inkscape:vp_y="0 : 999.99998 : 0"
+       inkscape:vp_z="210.00001 : 148.5 : 1"
+       inkscape:persp3d-origin="105 : 98.999998 : 1"
+       id="perspective849" />
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient837"
+       osb:paint="gradient">
+      <stop
+         style="stop-color:#f4f2e7;stop-opacity:1;"
+         offset="0"
+         id="stop833" />
+      <stop
+         style="stop-color:#f4f2e7;stop-opacity:0;"
+         offset="1"
+         id="stop835" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient859"
+       id="linearGradient861"
+       x1="103.69688"
+       y1="57.431084"
+       x2="109.04229"
+       y2="57.431084"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(-17.859375,12.473214)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient837"
+       id="linearGradient865"
+       gradientUnits="userSpaceOnUse"
+       x1="75.792099"
+       y1="75.392563"
+       x2="96.826477"
+       y2="75.392563" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="2.8"
+     inkscape:cx="-90.753064"
+     inkscape:cy="-9.3706492"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="3840"
+     inkscape:window-height="2081"
+     inkscape:window-x="2391"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-72.250155,-64.12887)">
+    <text
+       xml:space="preserve"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.28888893px;line-height:125%;font-family:Georgia;-inkscape-font-specification:'Georgia, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:url(#linearGradient865);stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="75.40625"
+       y="78.435272"
+       id="text12"><tspan
+         sodipodi:role="line"
+         id="tspan10"
+         x="75.40625"
+         y="78.435272"
+         style="stroke:url(#linearGradient865);stroke-width:0.26458332px"><tspan
+           style="fill:#0000f4;fill-opacity:1;stroke:url(#linearGradient865)"
+           id="tspan14">qb</tspan><tspan
+           style="fill:#8000df;fill-opacity:1;stroke:url(#linearGradient865)"
+           id="tspan831" /></tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.28888893px;line-height:125%;font-family:Georgia;-inkscape-font-specification:'Georgia, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="102.43154"
+       y="61.993305"
+       id="text847"><tspan
+         sodipodi:role="line"
+         id="tspan845"
+         x="102.43154"
+         y="72.178368"
+         style="stroke-width:0.26458332px" /></text>
+    <text
+       xml:space="preserve"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.28888893px;line-height:125%;font-family:Georgia;-inkscape-font-specification:'Georgia, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#8000df;fill-opacity:1;stroke:url(#linearGradient861);stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="86.178574"
+       y="72.104164"
+       id="text853"><tspan
+         sodipodi:role="line"
+         id="tspan851"
+         x="86.178574"
+         y="72.104164"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.93888903px;font-family:Georgia;-inkscape-font-specification:'Georgia, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#8000df;fill-opacity:1;stroke:url(#linearGradient861);stroke-width:0.26458332px">X</tspan></text>
+  </g>
+</svg>
