@@ -7,7 +7,7 @@
     <groupId>net.frostbyte.quickboardx</groupId>
     <artifactId>quickboardx-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
     <name>QuickBoardX</name>
     <description>A Free Scoreboard Bukkit plugin</description>
 
@@ -20,27 +20,36 @@
         <module>QuickboardX_1_8_R3</module>
         <module>QuickboardX_1_12_R1</module>
         <module>QuickboardX_1_14_R1</module>
+        <module>QuickboardX_1_15_R1</module>
         <module>dist</module>
     </modules>
 
     <repositories>
+        <!-- Paper MC -->
+        <repository>
+            <id>papermc</id>
+            <url>https://papermc.io/repo/repository/maven-public/</url>
+        </repository>
+
         <!-- frost-byte -->
         <repository>
             <id>frost-byte</id>
-            <url>https://frost-byte.net/nexus/repository/maven-public/</url>
+            <url>https://maven.pkg.github.com/frost-byte/QuickBoardX</url>
         </repository>
     </repositories>
     <distributionManagement>
-        <downloadUrl>https://frost-byte.net/nexus/repository/maven-public/</downloadUrl>
+        <downloadUrl>https://maven.pkg.github.com/frost-byte/maven-packages/</downloadUrl>
         <snapshotRepository>
-            <id>nexus-snapshots</id>
-            <name>frost-byte Snapshots</name>
-            <url>https://frost-byte.net/nexus/repository/maven-snapshots/</url>
+            <id>github-snapshots</id>
+            <name>GitHub frost-byte Snapshots Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/frost-byte/maven-packages</url>
+            <uniqueVersion>true</uniqueVersion>
         </snapshotRepository>
         <repository>
-            <id>nexus-releases</id>
-            <name>frost-byte Releases</name>
-            <url>https://frost-byte.net/nexus/repository/maven-releases/</url>
+            <id>github</id>
+            <name>GitHub frost-byte Releases Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/frost-byte/maven-packages</url>
+            <uniqueVersion>false</uniqueVersion>
         </repository>
     </distributionManagement>
 </project>

@@ -4,16 +4,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>quickboardx-core</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <parent>
         <groupId>net.frostbyte.quickboardx</groupId>
         <artifactId>quickboardx-parent</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.1.0-SNAPSHOT</version>
     </parent>
 
     <properties>
-        <paper.version>1.14.4-R0.1-SNAPSHOT</paper.version>
+        <paper.version>1.15.2-R0.1-SNAPSHOT</paper.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <mvdw.version>3.0.0-SNAPSHOT</mvdw.version>
@@ -30,7 +30,26 @@
         <!-- frost-byte -->
         <repository>
             <id>frost-byte</id>
-            <url>https://frost-byte.net/nexus/repository/maven-public/</url>
+            <url>https://maven.pkg.github.com/frost-byte/QuickBoardX</url>
+        </repository>
+
+        <!-- Maxim VDW Placeholder API-->
+        <repository>
+            <id>mvdw-software</id>
+            <name>MVdW Public Repositories</name>
+            <url>http://repo.mvdw-software.be/content/groups/public/</url>
+        </repository>
+
+        <!-- Clip Placeholder API -->
+        <repository>
+            <id>placeholderapi</id>
+            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+        </repository>
+
+        <!-- Aikar Command Framework -->
+        <repository>
+            <id>aikar</id>
+            <url>https://repo.aikar.co/content/groups/aikar/</url>
         </repository>
     </repositories>
 

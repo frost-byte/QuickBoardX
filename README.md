@@ -4,7 +4,7 @@ ___
 ### Features
 - Free!
 - No Flickering or Artifacts
-- Compatible with 1.8.8, 1.12.2 and 1.14.4
+- Compatible with 1.8.8, 1.12.2, 1.14.4 and 1.15.2
 - Updating Title 
 - Scrolling Text Elements
 - Changeable Text Elements
@@ -115,7 +115,7 @@ the lists of text and titles already defined in that scoreboard's yml file.
 <dependency>
     <groupId>net.frostbyte.quickboardx</groupId>
     <artifactId>quickboardx-core</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
     <scope>provided</scope>
 </dependency>
 ```
@@ -124,7 +124,7 @@ the lists of text and titles already defined in that scoreboard's yml file.
 ```xml
 <repository>
     <id>frost-byte</id>
-    <url>https://frost-byte.net/nexus/repository/maven-public/</url>
+    <url>https://maven.pkg.github.com/frost-byte/maven-packages</url>
 </repository>
 ```
 ##### plugin.yml
@@ -303,7 +303,7 @@ public class APIExample extends JavaPlugin {
 [3]: https://luckperms.net/
 [4]: https://helpch.at/discord
 [5]: https://github.com/frost-byte/QuickBoardX
-[6]: https://oss.frost-byte.net/nexus/ 
+[6]: https://maven.pkg.github.com/frost-byte/maven-packages/ 
 [7]: https://www.spigotmc.org/members/tejdik.28526/
 [8]: https://www.spigotmc.org/resources/quickboard-free-scoreboard-plugin-scroller-changeable-text-placeholderapi-anti-flicker.15057/
 [9]: https://discord.gg/MZNYhTA
@@ -311,7 +311,7 @@ public class APIExample extends JavaPlugin {
 
 ### Source Code
 [Github Repository][5]  
-[Nexus Maven Repository][6]  
+[Github Maven Repository][6]  
 
 ### Acknowledgements
 Thanks to [the_TadeSK][7] for the creation of [QuickBoard][8]; the plugin that QuickBoardX is based upon.

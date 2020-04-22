@@ -2,29 +2,29 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>net.frostbyte.quickboardx</groupId>
         <artifactId>quickboardx-parent</artifactId>
+        <groupId>net.frostbyte.quickboardx</groupId>
         <version>1.1.0-SNAPSHOT</version>
     </parent>
+    <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>quickboardx-1_8_R3</artifactId>
+    <artifactId>quickboardx-1_15_R1</artifactId>
     <packaging>jar</packaging>
 
     <properties>
         <acf.version>0.5.0-SNAPSHOT</acf.version>
-        <guice.version>4.0</guice.version>
-        <guava.version>20.0</guava.version>
-        <spigot_api.version>1.8.8-R0.1-SNAPSHOT</spigot_api.version>
+        <guice.version>4.2.0</guice.version>
+        <guava.version>27.1-jre</guava.version>
+        <paper.version>1.15.2-R0.1-SNAPSHOT</paper.version>
     </properties>
 
     <dependencies>
-        <!-- Spigot API -->
+        <!-- Paper API (extends Bukkit) -->
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>${spigot_api.version}</version>
+            <groupId>com.destroystokyo.paper</groupId>
+            <artifactId>paper-api</artifactId>
+            <version>${paper.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.guava</groupId>
@@ -37,18 +37,6 @@
                 <exclusion>
                     <groupId>commons-lang</groupId>
                     <artifactId>commons-lang</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.json</groupId>
-                    <artifactId>simple</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.junit</groupId>
-                    <artifactId>junit</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.hamcrest</groupId>
-                    <artifactId>hamcrest-core</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -85,7 +73,6 @@
             <groupId>net.frostbyte.quickboardx</groupId>
             <artifactId>quickboardx-core</artifactId>
             <version>${project.parent.version}</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
     <build>
@@ -111,7 +98,7 @@
                     <relocations>
                         <relocation>
                             <pattern>com.google.inject</pattern>
-                            <shadedPattern>net.frostbyte.quickboardx.v1_8_R3.inject</shadedPattern>
+                            <shadedPattern>net.frostbyte.quickboardx.v1_14_R1.inject</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
