@@ -116,15 +116,20 @@ the lists of text and titles already defined in that scoreboard's yml file.
     <groupId>net.frostbyte.quickboardx</groupId>
     <artifactId>quickboardx-core</artifactId>
     <version>1.1.0-SNAPSHOT</version>
-    <scope>provided</scope>
 </dependency>
 ```
 
-##### Repository
+##### Maven Repositories
 ```xml
+<!-- frost-byte snapshots -->
 <repository>
-    <id>frost-byte</id>
-    <url>https://maven.pkg.github.com/frost-byte/maven-packages</url>
+    <id>io.cloudrepo.snapshots</id>
+    <url>https://frostbyte.mycloudrepo.io/public/repositories/snapshots</url>
+</repository>
+<!-- frost-byte releases -->
+<repository>
+    <id>io.cloudrepo</id>
+    <url>https://frostbyte.mycloudrepo.io/public/repositories/releases</url>
 </repository>
 ```
 ##### plugin.yml
@@ -303,15 +308,17 @@ public class APIExample extends JavaPlugin {
 [3]: https://luckperms.net/
 [4]: https://helpch.at/discord
 [5]: https://github.com/frost-byte/QuickBoardX
-[6]: https://maven.pkg.github.com/frost-byte/maven-packages/ 
+[6]: https://frostbyte.mycloudrepo.io/public/repositories/releases 
 [7]: https://www.spigotmc.org/members/tejdik.28526/
 [8]: https://www.spigotmc.org/resources/quickboard-free-scoreboard-plugin-scroller-changeable-text-placeholderapi-anti-flicker.15057/
 [9]: https://discord.gg/MZNYhTA
+[10]: https://frostbyte.mycloudrepo.io/public/repositories/snapshots
 [logo]: https://github.com/frost-byte/QuickBoardX/blob/master/images/Layer-QuickboardX.png
 
 ### Source Code
 [Github Repository][5]  
-[Github Maven Repository][6]  
+[Github Maven Repository - Releases][6]  
+[Github Maven Repository - Snapshots][10]
 
 ### Acknowledgements
 Thanks to [the_TadeSK][7] for the creation of [QuickBoard][8]; the plugin that QuickBoardX is based upon.

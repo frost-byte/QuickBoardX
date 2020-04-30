@@ -27,10 +27,30 @@
     </properties>
 
     <repositories>
-        <!-- frost-byte -->
+        <!-- frost-byte snapshots -->
         <repository>
-            <id>frost-byte</id>
-            <url>https://maven.pkg.github.com/frost-byte/QuickBoardX</url>
+            <id>io.cloudrepo.snapshots</id>
+            <url>https://frostbyte.mycloudrepo.io/public/repositories/snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+        <!-- frost-byte releases -->
+        <repository>
+            <id>io.cloudrepo</id>
+            <url>https://frostbyte.mycloudrepo.io/public/repositories/releases</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
 
         <!-- Maxim VDW Placeholder API-->

@@ -98,7 +98,7 @@
                     <relocations>
                         <relocation>
                             <pattern>com.google.inject</pattern>
-                            <shadedPattern>net.frostbyte.quickboardx.v1_14_R1.inject</shadedPattern>
+                            <shadedPattern>net.frostbyte.quickboardx.v1_15_R1.inject</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>

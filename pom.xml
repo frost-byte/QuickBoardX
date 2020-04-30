@@ -31,25 +31,42 @@
             <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
 
-        <!-- frost-byte -->
+        <!-- frost-byte snapshots -->
         <repository>
-            <id>frost-byte</id>
-            <url>https://maven.pkg.github.com/frost-byte/QuickBoardX</url>
+            <id>io.cloudrepo.snapshots</id>
+            <url>https://frostbyte.mycloudrepo.io/public/repositories/snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+        <!-- frost-byte releases -->
+        <repository>
+            <id>io.cloudrepo</id>
+            <url>https://frostbyte.mycloudrepo.io/public/repositories/releases</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
     </repositories>
     <distributionManagement>
-        <downloadUrl>https://maven.pkg.github.com/frost-byte/maven-packages/</downloadUrl>
         <snapshotRepository>
-            <id>github-snapshots</id>
-            <name>GitHub frost-byte Snapshots Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/frost-byte/maven-packages</url>
-            <uniqueVersion>true</uniqueVersion>
+            <id>io.cloudrepo.snapshots</id>
+            <name>CloudRepo frost-byte Snapshots Apache Maven Packages</name>
+            <url>https://frostbyte.mycloudrepo.io/repositories/snapshots</url>
         </snapshotRepository>
         <repository>
-            <id>github</id>
-            <name>GitHub frost-byte Releases Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/frost-byte/maven-packages</url>
-            <uniqueVersion>false</uniqueVersion>
+            <id>io.cloudrepo</id>
+            <name>CloudRepo frost-byte Releases Apache Maven Packages</name>
+            <url>https://frostbyte.mycloudrepo.io/repositories/releases</url>
         </repository>
     </distributionManagement>
 </project>
