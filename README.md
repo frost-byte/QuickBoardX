@@ -120,6 +120,10 @@ the lists of text and titles already defined in that scoreboard's yml file.
 ```
 
 ##### Maven Repositories
+Free Repository Hosting provided by [CloudRepo.io][11]
+
+>  _CloudRepo.io allows open source projects to use their services at no cost._
+>  _They provide Public, Private and Proxy Repositories_
 ```xml
 <!-- frost-byte snapshots -->
 <repository>
@@ -313,6 +317,7 @@ public class APIExample extends JavaPlugin {
 [8]: https://www.spigotmc.org/resources/quickboard-free-scoreboard-plugin-scroller-changeable-text-placeholderapi-anti-flicker.15057/
 [9]: https://discord.gg/MZNYhTA
 [10]: https://frostbyte.mycloudrepo.io/public/repositories/snapshots
+[11]: https://www.cloudrepo.io
 [logo]: https://github.com/frost-byte/QuickBoardX/blob/master/images/Layer-QuickboardX.png
 
 ### Source Code
