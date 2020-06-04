@@ -5,7 +5,7 @@ import net.frostbyte.quickboardx.managers.BaseBoardManager.BoardTask;
 
 public class RemoveTempTask implements Runnable
 {
-	private PlayerBoard playerBoard;
+	private final PlayerBoard playerBoard;
 
 	public RemoveTempTask(BoardTask boardTask)
 	{

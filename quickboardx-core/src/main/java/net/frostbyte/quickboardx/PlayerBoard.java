@@ -19,15 +19,15 @@ import static net.frostbyte.quickboardx.managers.BaseBoardManager.BoardOperation
 @SuppressWarnings("unused")
 public class PlayerBoard {
 
-    private QuickBoardX plugin;
-    private Logger logger;
-    private BaseBoardManager boardManager;
+    private final QuickBoardX plugin;
+    private final Logger logger;
+    private final BaseBoardManager boardManager;
     @SuppressWarnings("WeakerAccess")
     public static final int NUM_LINES = 16;
     /**
      * The Player Unique ID (board viewer)
      */
-    private UUID playerID;
+    private final UUID playerID;
 
     /**
      * The board that was displayed before a temporary board is displayed,
@@ -40,13 +40,13 @@ public class PlayerBoard {
      * line of text.
      * The currently displayed value is updated on a regular basis.
      */
-    private HashMap<String, String> changeText = new HashMap<>();
+    private final HashMap<String, String> changeText = new HashMap<>();
 
 	/**
 	 * Currently selected index from the list of elements for
 	 * a changeable text element.
 	 */
-	private HashMap<String, Integer> changeIndices = new HashMap<>();
+	private final HashMap<String, Integer> changeIndices = new HashMap<>();
 
     /**
      * List of Title values cycled through on a periodic basis.
@@ -234,6 +234,7 @@ public class PlayerBoard {
 
                 if (currentBoard != null && currentBoard.boardConfig != null)
                     currentBoardName = currentBoard.boardConfig.getPermission();
+                boardManager.generateListTeams(playerID);
             }
         }
 
@@ -669,6 +670,7 @@ public class PlayerBoard {
 
         preventChange = false;
         startUpdates();
+        boardManager.generateListTeams(playerID);
     }
 
     /**

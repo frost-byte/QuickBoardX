@@ -3,6 +3,7 @@ package net.frostbyte.quickboardx.v1_15_R1.managers;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.frostbyte.quickboardx.QuickBoardX;
+import net.frostbyte.quickboardx.events.PlayerTeamUpdateEvent;
 import net.frostbyte.quickboardx.managers.BaseMessagingManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -39,6 +40,10 @@ public class MessagingManager extends BaseMessagingManager
 	{
 		super.onRespawn(event);
 	}
+
+	@Override
+	@EventHandler
+	public void onTeamUpdate(PlayerTeamUpdateEvent event) { super.onTeamUpdate(event); }
 
 	@Override
 	@EventHandler

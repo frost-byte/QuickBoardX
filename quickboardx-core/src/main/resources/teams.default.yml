@@ -1,0 +1,22 @@
+teams:
+  default:
+    displayName: ''
+    seeInvisble: false
+    allowFriendlyFire: false
+    nameTagVisible: 'ALWAYS'
+    collision: 'ALWAYS'
+    color: 'WHITE'
+    prefix: ''
+    suffix: ''
+  supporters:
+    seeInvisble: false
+    displayName: ''
+    allowFriendlyFire: false
+    nameTagVisible: 'ALWAYS'
+    collision: 'ALWAYS'
+    color: 'WHITE'
+    prefix: '&9[S]&r '
+    suffix: ''
+enabledScoreboards:
+- scoreboard.default
+applyToAllScoreboards: true

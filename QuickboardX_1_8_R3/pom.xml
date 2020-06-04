@@ -17,6 +17,8 @@
         <guice.version>4.0</guice.version>
         <guava.version>20.0</guava.version>
         <spigot_api.version>1.8.8-R0.1-SNAPSHOT</spigot_api.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -94,10 +96,8 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.7.0</version>
+                <version>3.8.1</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
                     <compilerArgs>
                         <arg>-parameters</arg>
                     </compilerArgs>

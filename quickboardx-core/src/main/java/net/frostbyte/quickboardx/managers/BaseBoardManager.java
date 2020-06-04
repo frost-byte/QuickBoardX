@@ -3,7 +3,9 @@ package net.frostbyte.quickboardx.managers;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.frostbyte.quickboardx.PlayerBoard;
 import net.frostbyte.quickboardx.QuickBoardX;
+import net.frostbyte.quickboardx.api.Team;
 import net.frostbyte.quickboardx.config.BoardConfig;
+import net.frostbyte.quickboardx.config.TeamConfig;
 import net.frostbyte.quickboardx.events.WhenPluginUpdateTextEvent;
 import net.frostbyte.quickboardx.tasks.RemoveTempTask;
 import net.frostbyte.quickboardx.tasks.UpdateChangeableTask;
@@ -43,6 +45,16 @@ public abstract class BaseBoardManager
 	protected Map<UUID, List<Integer>> playerBoardTasks = new HashMap<>();
 
 	/**
+	 * A map of player UUIDs to their teams.
+	 */
+	protected Map<UUID, Team> playerTeams = new HashMap<>();
+
+	/**
+	 * Map of Team Names to Teams
+	 */
+	protected Map<String, Team> teams = new HashMap<>();
+
+	/**
 	 * The maximum number of characters that a Team Prefix or Suffix can contain
 	 */
 	protected int affixMaxCharacters = 16;
@@ -79,6 +91,11 @@ public abstract class BaseBoardManager
 	 * Map of Board Names to their Configs
 	 */
 	protected HashMap<String, BoardConfig> boardConfigMap = new HashMap<>();
+
+	/**
+	 * Map of Team Names to their Configs
+	 */
+	protected HashMap<String, TeamConfig> teamConfigMap = new HashMap<>();
 
 	/**
 	 * Initialize the Scoreboard - including its objective, teams,
@@ -125,7 +142,7 @@ public abstract class BaseBoardManager
 	 *                  text displayed for the team.
 	 * @return The instance of the BoardManager implementation
 	 */
-	public abstract BaseBoardManager setTeamText(
+	public abstract BaseBoardManager setSidebarTeamText(
 		PlayerBoard playerBoard,
 		int teamIndex,
 		BoardLine boardLine
@@ -185,6 +202,234 @@ public abstract class BaseBoardManager
 	public abstract boolean isPlayerInvalid(UUID playerID);
 
 	/**
+	 * Set the Player Tab List Team for a player
+	 * @param playerID The player's uuid
+	 * @param teamName The player's team in the Tab List
+	 * @return this board manager
+	 */
+	public BaseBoardManager setPlayerTeam(UUID playerID, String teamName)
+	{
+		if (teamName == null || teamName.isEmpty())
+			return this;
+
+		logger.info("BaseBoardManager: setPlayerTeam " + teamName);
+		Team currentTeam = getPlayerTeam(playerID);
+		Team team = teams.getOrDefault(teamName, null);
+
+		if (team == null)
+			return this;
+
+		if (currentTeam != null)
+		{
+			if (teamName.equals(currentTeam.getName()))
+			{
+				logger.info("BaseBoardManager: setPlayerTeam: using current Team.");
+				return this;
+			}
+			logger.info("BaseBoardManager: setPlayerTeam: removing player from current Team.");
+
+			removePlayerFromTeam(playerID, currentTeam);
+		}
+
+		logger.info("BaseBoardManager: setPlayerTeam: adding Player to Team.");
+		team.addEntry(getPlayerName(playerID));
+
+		return this;
+	}
+
+	/**
+	 * Update the Player Tab List team on all player scoreboards.
+	 * @param team The updated team
+	 * @return this board manager
+	 */
+	public abstract BaseBoardManager updatePlayerListTeam(Team team);
+
+	/**
+	 * Update the Player Tab List team on all player scoreboards.
+	 * @param teamName The name of the updated team
+	 * @return this board manager
+	 */
+	public BaseBoardManager updatePlayerListTeam(String teamName)
+	{
+		net.frostbyte.quickboardx.api.Team team = getTeam(teamName);
+
+		if (team == null)
+			return this;
+
+		updatePlayerListTeam(team);
+
+		return this;
+	}
+
+	/**
+	 * Create the Bukkit Teams for the Player Tab List for the given player's scoreboard.
+	 * @param playerId The player
+	 * @return This board manager
+	 */
+	public BaseBoardManager generateListTeams(UUID playerId)
+	{
+		// Iterated Player
+		String playerName = getPlayerName(playerId);
+		PlayerBoard playerBoard = getPlayerBoard(playerId);
+
+		logger.info(
+			"BoardManager: generateListTeams for " + playerName
+		);
+		if (playerBoard == null)
+			return this;
+
+		String boardName = playerBoard.getBoardName();
+
+		teams.values().forEach(
+			team -> {
+				TeamConfig teamConfig = findTeamConfig(team.getName());
+
+				if (
+					teamConfig != null &&
+						(
+							teamConfig.applyToAllScoreboards() ||
+								teamConfig.getEnabledScoreboards().contains(boardName)
+						)
+				) {
+					logger.info(
+						"BoardManager: generateListTeams -> updating Scoreboard Team named " + team.getName() +
+							" for " + playerName
+					);
+					applyTeamEntries(team, playerId);
+				}
+			}
+		);
+		return this;
+	}
+
+	/**
+	 * Remove the specified player from the given team.
+	 * @param playerID The player to remove
+	 * @param currentTeam The team that the player will be removed from.
+	 */
+	public abstract void removePlayerFromTeam(UUID playerID, Team currentTeam);
+
+	/**
+	 * Remove the target player from their team on another user's board.
+	 * @param targetID The target player who will be removed from their team on another player's board..
+	 * @param boardUserID The board user
+	 */
+	public abstract void removeTeamForOtherPlayer(UUID targetID, UUID boardUserID);
+
+	/**
+	 * Update the target player's team entry, for the Player Tab List, on another user's scoreboard.
+	 * @param targetID The target player whose team will be updated on the user player's scoreboard.
+	 * @param boardUserID The board user whose scoreboard team, matching the target player's team,
+	 *                    will have an entry updated.
+	 */
+	public abstract void updateTeamForOtherPlayer(UUID targetID, UUID boardUserID);
+
+	/**
+	 * Retrieve the given player's current Scoreboard Team (for the Player Tab List)
+	 * @param playerID The given player ID
+	 * @return The player's team.
+	 */
+	public Team getPlayerTeam(UUID playerID)
+	{
+		String playerName = getPlayerName(playerID);
+		if (playerName == null)
+			return null;
+
+		return teams
+			.values()
+			.stream()
+			.filter(t -> t.hasEntry(playerName))
+			.findFirst()
+			.orElse(null);
+	}
+
+	public BaseBoardManager registerTabListTeam(Team team)
+	{
+		if (team != null)
+		{
+			logger.info("Registering Player Tab List Team " + team.getName());
+			teams.put(team.getName(), team);
+		}
+		else
+			logger.info("ERROR! Could not registering Player Tab List Team!");
+
+		return this;
+	}
+
+	/**
+	 * Retrieve a registered Player Tab List Team by name.
+	 * @param name The Team Name
+	 * @return The Registered Team
+	 */
+	public Team getTeam(String name)
+	{
+		return teams.getOrDefault(name, null);
+	}
+
+	/**
+	 * Describes the Details for a Player Tab List Team, given a team name.
+	 * @param teamName The Team Name
+	 * @return Details for the Team or an error message if no team was registered with the given
+	 * name.
+	 */
+	public String getTeamInformation(String teamName)
+	{
+		Team team = getTeam(teamName);
+		if (team != null)
+			return team.information();
+
+		return ERROR_TEAM_DOES_NOT_EXIST;
+	}
+
+	/**
+	 * Set the Prefix for a Player Tab List Team
+	 * @param teamName The Tab List Team to UPdate
+	 * @param teamPrefix The new Prefix for the Team
+	 * @return this board manager
+	 */
+	public BaseBoardManager setTeamPrefix(String teamName, String teamPrefix)
+	{
+		if (
+			teamName != null &&
+			!teamName.isEmpty() &&
+			teamPrefix != null &&
+			!teamPrefix.isEmpty()
+		) {
+			Team team = teams.getOrDefault(teamName, null);
+			if (team != null)
+			{
+				team.setPrefix(teamPrefix);
+				updateTeams();
+			}
+		}
+		return this;
+	}
+
+	/**
+	 * Update all Player Tab list Teams
+	 * @return this board manager
+	 */
+	public abstract BaseBoardManager updateTeams();
+
+	/**
+	 * All Player Tab List Teams
+	 * @return A List of Registered Teams that can be displayed in the Player Tab List
+	 */
+	public List<Team> getTabListTeams()
+	{
+		return new ArrayList<>(teams.values());
+	}
+
+	/**
+	 * All Player Tab List Team Names
+	 * @return A List of Registered Team Names that can be displayed in the Player Tab List
+	 */
+	public List<String> getTabListTeamNames()
+	{
+		return new ArrayList<>(teams.keySet());
+	}
+
+	/**
 	 * The Default Constructor for BaseBoardManager
 	 * @param plugin The Quickboard Plugin
 	 */
@@ -209,6 +454,19 @@ public abstract class BaseBoardManager
 	}
 
 	/**
+	 * Add a Team configuration to the manager.
+	 *
+	 * @param teamName The name and permission for the board configuration
+	 * @param teamConfig The board configuration
+	 * @return The instance of the BoardManager implementation
+	 */
+	public BaseBoardManager addTeamConfig(String teamName, TeamConfig teamConfig)
+	{
+		teamConfigMap.put(teamName, teamConfig);
+		return this;
+	}
+
+	/**
 	 * Stop all running tasks for the given player board.
 	 *
 	 * @param playerID The Player Scoreboard wrapper
@@ -229,7 +487,6 @@ public abstract class BaseBoardManager
 		BoardOperation operation = task.getOperation();
 		UUID playerID = task.getPlayerBoard().getPlayerID();
 		Runnable runnable;
-
 		switch (operation)
 		{
 			case UPDATE_TITLE:
@@ -251,6 +508,7 @@ public abstract class BaseBoardManager
 			default:
 				throw new IllegalStateException("Unexpected value: " + operation);
 		}
+
 		int taskID = scheduleTask(runnable, operation);
 		List<Integer> tasksList = getTasksList(playerID);
 
@@ -289,6 +547,16 @@ public abstract class BaseBoardManager
 	}
 
 	/**
+	 * Retrieve the map of loaded unique team configurations.
+	 *
+	 * @return The team configurations
+	 */
+	public HashMap<String, TeamConfig> getTeamConfigMap()
+	{
+		return teamConfigMap;
+	}
+
+	/**
 	 * Retrieve the total number of registered Scoreboard Configurations.
 	 * @return The number of unique scoreboard configurations loaded.
 	 */
@@ -297,11 +565,104 @@ public abstract class BaseBoardManager
 	/**
 	 * Find a loaded Board Config using the given Board Name
 	 * @param boardName The name of the board
-	 * @return The Boards Configuration or null, if none was found.
+	 * @return The Board's Configuration or null, if none was found.
 	 */
 	public BoardConfig getBoardConfig(String boardName)
 	{
 		return boardConfigMap.getOrDefault(boardName, null);
+	}
+
+	/**
+	 * Find a loaded Team Config using the given Team Name
+	 * @param teamName The name of the team
+	 * @return The Team's Configuration or null, if none was found.
+	 */
+	public TeamConfig getTeamConfig(String teamName) { return teamConfigMap.getOrDefault(teamName, null); }
+
+	/**
+	 * Find a TeamConfig containing the given team
+	 * @param teamName The name of the team
+	 * @return A TeamConfig containing the team or null, if none was found.
+	 */
+	public TeamConfig findTeamConfig(String teamName) {
+		for (Map.Entry<String, TeamConfig> entry : teamConfigMap.entrySet())
+		{
+			String name = entry.getKey();
+			TeamConfig config = entry.getValue();
+			if (config.getTeamNames().contains(teamName))
+				return config;
+		}
+		return null;
+	}
+
+	/**
+	 * Retrieve a list of the Enabled Scoreboards from a team's configuration.
+	 * @param configName The name of the Team Configuration
+	 * @return A string containing a list of the enabled scoreboards.
+	 */
+	public String listEnabledTeamScoreboards(String configName)
+	{
+		TeamConfig config = getTeamConfig(configName);
+		if (config != null)
+		{
+			StringBuilder builder = new StringBuilder();
+			for (String boardName : config.getEnabledScoreboards())
+			{
+				builder.append(boardName)
+					.append("\n");
+			}
+			return builder.toString();
+		}
+
+		return ERROR_FAILED;
+	}
+
+	/**
+	 * Enable a Scoreboard for the Specified Team Configuration.
+	 * @param teamConfigName The Name of the Team
+	 * @param boardName The Scoreboard's name.
+	 * @return A message describing the result of the operation.
+	 */
+	public String addEnabledBoard(String teamConfigName, String boardName)
+	{
+		TeamConfig config = getTeamConfig(teamConfigName);
+		if (config != null)
+		{
+			List<String> enabledBoards = config.getEnabledScoreboards();
+			if (!enabledBoards.contains(boardName))
+			{
+				enabledBoards.add(boardName);
+				config.setEnabledScoreboards(enabledBoards);
+				return String.format(TEAM_SCOREBOARD_ENABLED, boardName);
+			}
+			else
+				return ERROR_TEAM_SCOREBOARD_ALREADY_ENABLED;
+		}
+		return ERROR_FAILED;
+	}
+
+	/**
+	 * Remove an Enabled Scoreboard from the Configuration for a Team displayed in the Player Tab List
+	 * @param configName The Team Configuration Name
+	 * @param boardName The Scoreboard to disable fo
+	 * @return A message describing the result of the operation
+	 */
+	public String removeEnabledBoard(String configName, String boardName)
+	{
+		TeamConfig config = getTeamConfig(configName);
+		if (config != null)
+		{
+			List<String> enabledBoards = config.getEnabledScoreboards();
+			if (enabledBoards.contains(boardName))
+			{
+				enabledBoards.remove(boardName);
+				config.setEnabledScoreboards(enabledBoards);
+				return String.format(TEAM_SCOREBOARD_REMOVED, boardName);
+			}
+			else
+				return ERROR_TEAM_SCOREBOARD_NOT_DISABLED;
+		}
+		return ERROR_FAILED;
 	}
 
 	/**
@@ -326,6 +687,13 @@ public abstract class BaseBoardManager
 			return ERROR_FAILED;
 	}
 
+	/**
+	 * Add a World to a BoardConfiguration, so that it's scoreboard will be displayed when
+	 * players are in that world.
+	 * @param boardName The Name of the Board Configuration
+	 * @param worldName The Name of the World to Enable for the Board Configuration
+	 * @return A message describing the results of the operation.
+	 */
 	public String addEnabledWorld(String boardName, String worldName)
 	{
 		BoardConfig config = getBoardConfig(boardName);
@@ -344,23 +712,31 @@ public abstract class BaseBoardManager
 		return ERROR_FAILED;
 	}
 
+	/**
+	 * Remove a World from a BoardConfiguration, so that it's scoreboard will NOT be displayed when
+	 * players are in that world.
+	 * @param boardName The Name of the Board Configuration
+	 * @param worldName The Name of the World to Disable for the Board Configuration
+	 * @return A message describing the results of the operation.
+	 */
 	public String removeEnabledWorld(String boardName, String worldName)
 	{
 		BoardConfig config = getBoardConfig(boardName);
 		if (config != null)
 		{
 			List<String> enabledWorlds = config.getEnabledWorlds();
-			if (!enabledWorlds.contains(worldName))
+			if (enabledWorlds.contains(worldName))
 			{
 				enabledWorlds.remove(worldName);
 				config.setEnabledWorlds(enabledWorlds);
 				return String.format(WORLD_REMOVED, worldName);
 			}
 			else
-				return ERROR_WORLD_NOT_ENABLED;
+				return ERROR_WORLD_NOT_DISABLED;
 		}
 		return ERROR_FAILED;
 	}
+
 	/**
 	 * Finds a Board Configuration for the given board name; will load the config, if necessary (and it exists).
 	 *
@@ -389,6 +765,33 @@ public abstract class BaseBoardManager
 	}
 
 	/**
+	 * Finds a Team Configuration for the given team name; will load the config, if necessary (and it exists).
+	 *
+	 * @param configName The name of the team configuration
+	 * @param readFile Whether the Team's Config file should be read or not
+	 * @return An Optional containing the Team Configuration matching the given team name,
+	 * if there is no file for the given team name, then the optional will be empty.
+	 */
+	protected Optional<TeamConfig> getTeamConfig(String configName, boolean readFile)
+	{
+		TeamConfig config = getTeamConfigMap().getOrDefault(
+			configName,
+			null
+		);
+
+		if (config == null)
+			config = new TeamConfig(plugin, configName, readFile);
+
+		if (config.fileExists())
+		{
+			teamConfigMap.putIfAbsent(configName, config);
+			return Optional.of(config);
+		}
+		else
+			return Optional.empty();
+	}
+
+	/**
 	 * Retrieve the PlayerBoard for the given player UUID.
 	 *
 	 * @param playerID The player UUID
@@ -397,6 +800,29 @@ public abstract class BaseBoardManager
 	public PlayerBoard getPlayerBoard(UUID playerID)
 	{
 		return boards.getOrDefault(playerID, null);
+	}
+
+	/**
+	 * Retrieve the Team Names for the Given Scoreboard
+	 * @param boardName The Scoreboard
+	 * @return The list of teams available to the Player Tab List for the scoreboard.
+	 */
+	public List<String> getTeamsForBoard(String boardName)
+	{
+		List<String> usableTeams = new ArrayList<>();
+		List<TeamConfig> teamConfigs = new ArrayList<>(teamConfigMap.values());
+		teamConfigs.forEach(config -> {
+			if (
+				config.applyToAllScoreboards() ||
+				config.getEnabledScoreboards().contains(boardName)
+			) {
+				config.getTeamNames().forEach(tn -> {
+					if (!usableTeams.contains(tn))
+						usableTeams.add(tn);
+				});
+			}
+		});
+		return usableTeams;
 	}
 
 	/**
@@ -469,6 +895,7 @@ public abstract class BaseBoardManager
 					if (boardConfig != null)
 					{
 						changePlayerBoard(playerID, boardConfig.getPermission());
+						generateListTeams(playerID);
 						return SCOREBOARD_CHANGED;
 					}
 				}
@@ -511,6 +938,7 @@ public abstract class BaseBoardManager
 					if (boardConfig != null)
 					{
 						changePlayerBoard(playerID, boardConfig.getPermission());
+						generateListTeams(playerID);
 						return SCOREBOARD_CHANGED;
 					}
 				}
@@ -540,6 +968,8 @@ public abstract class BaseBoardManager
 			changePlayerBoard(playerID, boardName);
 		else
 			new PlayerBoard(plugin, playerID, boardConfig);
+
+		generateListTeams(playerID);
 
 		return null;
 	}
@@ -624,7 +1054,7 @@ public abstract class BaseBoardManager
 					if (cfg.fileExists())
 					{
 						result.set(
-							HEADER + "§aFile created! Now add lines using §6/qb addline " +
+							HEADER + "§aFile created! Now add lines using §6/qbx addline " +
 								boardName
 						);
 						cfg.setTitle(
@@ -653,6 +1083,63 @@ public abstract class BaseBoardManager
 			);
 
 		return result.get();
+	}
+
+	/**
+	 * Creates a new Team Configuration with the given name and usable
+	 * by the given Scoreboard.
+	 *
+	 * @param newTeam The new player list team to create
+	 * @param boardName The name of the board that can use the Team
+	 * @return A message describing the success or failure when creating the new configuration.
+	 */
+	public String createTeamConfig(Team newTeam, String boardName, boolean applyToAll)
+	{
+		if (newTeam != null && !plugin.hasTeam(newTeam.getName()))
+		{
+			String configName = "teams." + newTeam.getName();
+			AtomicReference<String> result = new AtomicReference<>("");
+			getTeamConfig(configName, true)
+				.ifPresent((c) -> result.set(ERROR_ALREADY_USED));
+
+			if (!result.get().isEmpty())
+				return result.get();
+
+			getTeamConfig(configName, false)
+			.ifPresent(
+				(cfg) ->
+				{
+					if (cfg.fileExists())
+					{
+						result.set(
+							HEADER + "§aTeam Config File created! Edit the file to configure " +
+							configName
+						);
+						cfg.addTeam(newTeam);
+
+						if (boardName != null && !boardName.isEmpty())
+						{
+							String newBoardName;
+
+							if (!boardName.startsWith("scoreboard."))
+							{
+								newBoardName = "scoreboard." + boardName;
+							}
+							else
+								newBoardName = boardName;
+							cfg.enableScoreboard(newBoardName);
+						}
+
+						cfg.setApplyToAllScoreboards(applyToAll);
+					}
+					else
+						result.set(ERROR_FILE_CREATION);
+				}
+			);
+
+			return result.get();
+		}
+		return ERROR_TEAM_FILE_NOT_CREATED;
 	}
 
 	/**
@@ -938,6 +1425,8 @@ public abstract class BaseBoardManager
 		else
 			new PlayerBoard(plugin, playerID, getBoardConfigMap().get(boardName));
 
+		generateListTeams(playerID);
+
 		return null;
 	}
 
@@ -961,6 +1450,7 @@ public abstract class BaseBoardManager
 		{
 			text = plugin.getConfig().getString("messages.ontoggle.true");
 			createDefaultScoreboard(playerID);
+			generateListTeams(playerID);
 		}
 
 		if (text != null && !text.isEmpty())
@@ -987,9 +1477,38 @@ public abstract class BaseBoardManager
 		{
 			BoardConfig boardConfig = getBoardConfigMap().get(boardName);
 			boolean inEnabledWorlds = (boardConfig.getEnabledWorlds() != null && boardConfig.getEnabledWorlds().contains(worldName));
-			result.append("Scoreboard='").append(boardName).append("'");
-			result.append(" in enabled worlds=").append(inEnabledWorlds);
-			result.append(" has permission=").append(getPlayerPermission(playerID, boardName));
+			result.append("Scoreboard='").append(boardName).append("'\n");
+			result.append(" in enabled worlds=").append(inEnabledWorlds).append("\n");
+			result.append(" has permission=").append(getPlayerPermission(playerID, boardName)).append("\n");
+		}
+
+		return result.toString();
+	}
+
+	/**
+	 * Show details for the given players currently used TeamConfiguration that determines which team they player is in
+	 * for the Player Tab List.
+	 * @param playerID The player's id.
+	 * @return The Team Config details
+	 */
+	public String checkPlayerTeamConfig(UUID playerID)
+	{
+		checkPlayerConfig(playerID);
+		File fo = new File(plugin.getDataFolder().getAbsolutePath() + "/teams");
+		plugin.loadTeams(fo);
+		StringBuilder result = new StringBuilder("§cTeam info:");
+
+		PlayerBoard playerBoard = getPlayerBoard(playerID);
+
+		String boardName = (playerBoard != null) ? playerBoard.getBoardName() : "";
+
+		for (String teamName : getTeamConfigMap().keySet())
+		{
+			TeamConfig teamConfig = getTeamConfigMap().get(teamName);
+			List<String> boards = teamConfig.getEnabledScoreboards();
+			boolean boardEnabled = (boards != null && !boardName.isEmpty() && boards.contains(boardName));
+			result.append("Team='").append(teamName).append("'\n");
+			result.append(" using enabled board=").append(boardEnabled).append("\n");
 		}
 
 		return result.toString();
@@ -1017,11 +1536,55 @@ public abstract class BaseBoardManager
 			text = plugin.getConfig().getString("messages.ontoggle.true");
 
 			createDefaultScoreboard(playerID);
+			generateListTeams(playerID);
 		}
 
 		if (text != null && !text.isEmpty())
 			text = text.replace("&", "§");
 
+		return text;
+	}
+
+	public String reloadPlayerTeams()
+	{
+		String text =
+			HEADER + "§aTeam Config file reloaded\n" +
+			HEADER + "§cCreating Teams for player's tab list\n";
+
+		// Preserve existing team's for each player
+		Map<String, List<String>> tempPlayerTeams = new HashMap<>();
+		for (Player p : Bukkit.getOnlinePlayers())
+		{
+			UUID pid = p.getUniqueId();
+			Team team = getPlayerTeam(pid);
+
+			if (team != null)
+			{
+				String teamName = team.getName();
+				List<String> teamPlayers = tempPlayerTeams.getOrDefault(teamName, new ArrayList<>());
+				teamPlayers.add(p.getName());
+				tempPlayerTeams.put(team.getName(), teamPlayers);
+			}
+		}
+
+		File fo = new File(plugin.getDataFolder().getAbsolutePath() + "/teams");
+		plugin.loadTeams(fo);
+
+		// reassign teams for each player
+		tempPlayerTeams.forEach(
+			(String teamName, List<String> players) -> players.forEach(
+				playerName -> {
+					Team team = getTeam(teamName);
+					if (team != null && !team.hasEntry(playerName))
+					{
+						team.addEntry(playerName);
+					}
+				}
+			)
+		);
+
+		updateTeams();
+		text += HEADER + "§aDefault Tab List Teams created for each player";
 		return text;
 	}
 
@@ -1161,13 +1724,26 @@ public abstract class BaseBoardManager
 		return this;
 	}
 
+	/**
+	 * Change the Given Player's active scoreboard, using the specified BoardConfiguration
+	 * @param playerID The player's ID
+	 * @param configName The Name of the BoardConfiguration describing the player's new Sidebar Scoreboard
+	 * @return This board manager
+	 */
 	public BaseBoardManager changePlayerBoard(UUID playerID, String configName)
 	{
+		Team team = getPlayerTeam(playerID);
 		// Reset the Player Scoreboard to a default board and remove all references
 		resetPlayerScoreboard(playerID);
 
+		// TODO: Update Player Tab Lists
 		// Create the new Board using the given config
 		createBoard(playerID, configName);
+
+		setPlayerTeam(playerID, team.getName());
+		logger.info("BaseBoardManager->changePlayerBoard: " + team.getName() + ":" + getPlayerName(playerID));
+		generateListTeams(playerID);
+		updatePlayerListTeam(team);
 		return this;
 	}
 
@@ -1219,6 +1795,7 @@ public abstract class BaseBoardManager
 	 * for each.
 	 *
 	 * @param playerID The player's Unique ID
+	 * @param boardName The name of the temporary board formatted as scoreboard.name
 	 * @param text The text content to be displayed in the body of the scoreboard
 	 * @param title The list of titles to be displayed as the scoreboard's titles.
 	 * @param updateTitleTicks The update frequency, in ticks, for changing the title
@@ -1227,6 +1804,7 @@ public abstract class BaseBoardManager
 	 */
 	public PlayerBoard createTemporaryBoard(
 		UUID playerID,
+		String boardName,
 		List<String> text,
 		List<String> title,
 		int updateTitleTicks,
@@ -1235,7 +1813,7 @@ public abstract class BaseBoardManager
 		return new PlayerBoard(
 			plugin,
 			playerID,
-			"temporary",
+			boardName,
 			text,
 			title,
 			updateTitleTicks,
@@ -1308,8 +1886,24 @@ public abstract class BaseBoardManager
 	}
 
 	/**
-	 * Setup all Text lines in a scoreboard using Teams.
-	 * Each board displays one line for each team entry, and each team can have a prefix and suffix,
+	 * Apply A Player List Team's Settings and Entries to the Bukkit Scoreboard Team for the specified player.
+	 * @param team The Player List Team
+	 * @param playerID The Player whose Player List Scoreboard Team will be updated.
+	 */
+	public abstract void applyTeamEntries(
+		net.frostbyte.quickboardx.api.Team team,
+		UUID playerID
+	);
+
+	/**
+	 * Update the Player's Team for Display in the Player Tab List (not the Sidebar)
+	 * @return this BoardManager
+	 */
+	public abstract BaseBoardManager updatePlayerListTeams();
+
+	/**
+	 * Setup all Text lines for the Sidebar for the given Player Scoreboard.
+	 * Each board displays one line for each team entry, in the Sidebar Slot, and each team can have a prefix and suffix,
 	 * as well as entries.  On older MC versions, the prefix, suffix and entry are limited to 16 characters each.
 	 * So a total of 48 characters could potentially displayed on one line.  However, in order to display
 	 * properly, the input string must be parsed for Chat Color codes to carry over from prefix to entry to suffix.
@@ -1334,15 +1928,15 @@ public abstract class BaseBoardManager
 			if (line.length() < 3)
 				line = line + "§r";
 
-			setTeamText(playerBoard, lineIndex, new BoardLine(affixMaxCharacters, line));
+			setSidebarTeamText(playerBoard, lineIndex, new BoardLine(affixMaxCharacters, line));
 			lineIndex--;
 		}
 		return this;
 	}
 
 	/**
-	 * Updates the scoreboard display - including scroller elements, changeable
-	 * text elements and the title.
+	 * Updates the text displayed in the Sidebar Slot for the given Player's Scoreboard - includes scroller elements,
+	 * changeable text elements and the title.
 	 *
 	 * @param playerBoard The player board
 	 * @return The instance of the BoardManager implementation
@@ -1411,7 +2005,7 @@ public abstract class BaseBoardManager
 				}.runTaskLater(plugin, 1);
 
 				BoardLine boardLine = new BoardLine(affixMaxCharacters, event.getText());
-				setTeamText(
+				setSidebarTeamText(
 					playerBoard,
 					teamIndex,
 					boardLine
@@ -1451,6 +2045,7 @@ public abstract class BaseBoardManager
 		return s;
 	}
 
+	//TODO: Add the ability to Process Placeholders in TeamConfigurations: name, displayName, color, prefix, suffix, etc.
 	/**
 	 * Convert Chat Color characters in an input string, while trimming it to specific length.
 	 *
@@ -1730,9 +2325,9 @@ public abstract class BaseBoardManager
 		private String prefix;
 		private String entry;
 		private String suffix = "" + ChatColor.RESET;
-		private String input;
+		private final String input;
 		private int affixMaxChars = 16;
-		private int maxCharacters = affixMaxChars * 2;
+		private final int maxCharacters = affixMaxChars * 2;
 
 		public BoardLine(int affixMax, String input) {
 			this.affixMaxChars = affixMax;

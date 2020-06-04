@@ -4,6 +4,7 @@ ___
 ### Features
 - Free!
 - No Flickering or Artifacts
+- Per Player Scoreboards for the Sidebar and Player Tab List
 - Compatible with 1.8.8, 1.12.2, 1.14.4 and 1.15.2
 - Updating Title 
 - Scrolling Text Elements
@@ -11,6 +12,7 @@ ___
 - Support for Placeholders; Placeholder API and MaximVDW
 - Tab Completion for all Commands
 - Fully Configurable Scoreboards: Control Visibility by World Names
+- Fully Configurable Teams for the Player Tab List, which can change based upon the board displayed
 - Scoreboards can be created and configured using Commands
 - Multiple Scoreboards for the Same World
 - An API for Interacting with Scoreboards and Creating Temporary Scoreboards
@@ -75,13 +77,43 @@ ___
 | /qbx listworlds   | _None_                                | _lsw_     | _quickboardx.info_    | _List the Enabled Worlds for a Scoreboard._ |
 | /qbx addworld     | _\<scoreboard> <world\>_              | _aw_      | _quickboardx.edit_    | _Add a world to the enabled worlds for a Scoreboard._ |
 | /qbx removeworld  | _\<scoreboard> <world\>_              | _rw_      | _quickboardx.edit_    | _Remove a world from the enabled worlds for a Scoreboard._ |
+| /qbx check_team   | _None_                                | _t_check_ | _quickboardx.check_   | _Displays your current Player Tab List team based upon your active Scoreboard, and whether the team is applied for that scoreboard_ |
+| /qbx list_teams   | _None_                                | _lst_     | _quickboardx.info_    | _View the list of all Player Tab List teams._ |
+| /qbx show_team    | _None_                                | _t_show_  | _quickboardx.check_   | _Shows the configuration for your Player Tab List team._ |
 
-
-##### Scoreboards
-> Permissions for scoreboards are based upon the name of the scoreboards configuration file.
+#### Scoreboards
+> QuickBoardX allows for the customization of both the Sidebar Slot and the Player Tab List.
+> This is accomplished by creating per player Scoreboards which define the contents in the Sidebar and Tab List.
+> The permission required to see a scoreboard comes from the name of the scoreboard's configuration file.
 >
-> For example, the default scoreboard configuration file is called **_scoreboard.default.yml_**, the permission
+> For example, the default scoreboard configuration file is **_scoreboard.default.yml_**, the permission
 > required to see the default scoreboard is **_scoreboard.default_**
+
+##### Teams
+> The default Player Tab List team definition is in teams/teams.default.yml.  You can add additional
+> teams to the config.
+>
+> The properties for each team defined in the config match up with those defined by the Spigot API which
+> is based upon how they are defined in Vanilla Minecraft.
+>
+> When defining a color for a team prefix or suffix, you must use a color code, preceded by an &; make sure to include the
+> reset color code at the end of the prefix (&r), otherwise the color might will be applied to the player's
+> name.
+>
+> The color property for a team applies to all player names that have been added to that team.
+> 
+> `enabledScoreboards` The defined teams will only apply to the QuickBoardX Scoreboards in this list.
+> `applyToAllScoreboards` All Scoreboards defined by QuickBoardX will use the teams defined in the config.
+>
+> For further details about Scoreboard Teams in Minecraft and the Spigot API for Scoreboard teams
+> check out the following links:
+>
+> [Gamepedia Scoreboard Teams][gp_teams]
+>
+> [How-to: Create Scoreboard Teams for Dummies][dummies_teams]
+>
+> [Spigot Javadocs][spigot_teams]
+
 ### Placeholders
 > Want to use placeholders in your scoreboards? Then follow the steps below to get started!
 ##### Placeholder API
@@ -101,12 +133,17 @@ ___
 
 ### API
 
-The API provides plugin developers with methods for creating scoreboards, both permanent and temporary.
-Temporary boards will only be displayed for a short period of time, and using Scrollable or Changeable elements
-is not recommended.
-Methods are provided for referencing existing scoreboard configuration files. Those methods allow you to reference
-the lists of text and titles already defined in that scoreboard's yml file.
+The API provides plugin developers with methods for creating custom sidebar scoreboards, both permanent and temporary.
+Temporary boards will only be displayed for a short time. Using Scrollable or Changeable elements
+should not be used in temporary scoreboards.
+Methods have been included for referencing existing scoreboard configuration files. Those methods allow you to access
+the lists of text and titles already defined in that scoreboard's configuration file.
 
+In addition to the Sidebar scoreboard, the Player Tab List can be customized per player. Whenever
+a player joins the server they will be added to the default team defined in the default team config file.
+The recommended way to change a player's team is to call the `PlayerTeamUpdate` event and providing the player's
+UUID and the name of the Team that they are joining.
+ 
 #### Maven
 
 ##### Artifact
@@ -119,11 +156,11 @@ the lists of text and titles already defined in that scoreboard's yml file.
 </dependency>
 ```
 
-##### Maven Repositories
-Free Repository Hosting provided by [CloudRepo.io][11]
 
+![CloudRepo.io][cloud]
 >  _CloudRepo.io allows open source projects to use their services at no cost._
 >  _They provide Public, Private and Proxy Repositories_
+##### Maven Repositories
 ```xml
 <!-- frost-byte snapshots -->
 <repository>
@@ -141,110 +178,8 @@ Free Repository Hosting provided by [CloudRepo.io][11]
 depend: [QuickBoardX]
 ```
 
-##### Interface
-```java
-public interface QuickBoardAPI
-{
+[QuickBoardX API][api]
 
-    /**
-     * Create a Temporarily displayed scoreboard for a Player.
-     *
-     * @param playerID The Player's UUID
-     * @param boardName The name of the scoreboard config to use. (without the extension)
-     * @return The Playerboard
-     */
-    PlayerBoard createTemporaryBoard(UUID playerID, String boardName);
-
-    /**
-     * Create a Temporarily displayed scoreboard for a player
-     *
-     * @param playerID The player's UUID
-     * @param text The Text lines for the body of the scoreboard
-     * @param title The Lines of Text displayed in the Board Title
-     * @param updateTitle The update interval for cycling through the Title Lines, in ticks.
-     * @param updateText The update interval for scrollable and changeable elements contained in the scoreboard.
-     * @return The PlayerBoard that was created using the given parameters.
-     */
-    PlayerBoard createTemporaryBoard(
-        UUID playerID,
-        String boardName,
-        List<String> title,
-        List<String> text,
-        int updateTitle,
-        int updateText
-    );
-
-    /**
-     * Create a scoreboard for a Player.
-     * 
-     * @param playerID The Player's UUID
-     * @param name The name of the scoreboard config to use. (without the extension)
-     * @return The Playerboard
-     */
-    @SuppressWarnings("UnusedReturnValue")
-    PlayerBoard createBoard(UUID playerID, String name);
-
-    /**
-     * Create a Player Board for a player
-     * 
-     * @param playerID The player's UUID
-     * @param text The Text lines for the body of the scoreboard
-     * @param title The Lines of Text displayed in the Board Title
-     * @param updateTitle The update interval for cycling through the Title Lines, in ticks.
-     * @param updateText The update interval for scrollable and changeable elements contained in the scoreboard.
-     * @return The PlayerBoard that was created using the given parameters.
-     */
-    PlayerBoard createBoard(
-        UUID playerID,
-        List<String> text,
-        List<String> title,
-        int updateTitle,
-        int updateText
-    );
-
-    /**
-     * Retrieve the list of all registered Player Scoreboards.
-     * @return The list of player boards
-     */
-    List<PlayerBoard> getAllBoards();
-
-    /**
-     * Retrieve the map of player UUID's to their registered
-     * player boards.
-     * @return A map of player IDs to Player Boards
-     */
-    HashMap<UUID, PlayerBoard> getBoards();
-
-    /**
-     * Remove a Player's Scoreboard.
-     * 
-     * @param playerID The Player's UUID
-     */
-    void removeBoard(UUID playerID);
-
-    /**
-     * Update the Text for a Player's Scoreboard.
-     *
-     * @param playerID The Player's UUID
-     */
-    void updateText(UUID playerID);
-
-    /**
-     * Update the Title for a Player's Scoreboard.
-     *
-     * @param playerID The Player's UUID
-     */
-    void updateTitle(UUID playerID);
-
-    /**
-     * Update the Title, Text, Changeable and Scrollable 
-     * elements for a Player's Scoreboard.
-     *
-     * @param playerID The Player's UUID
-     */
-    void updateAll(UUID playerID);
-}
-```
 ##### Example Usage
 ```java
 package net.frostbyte.quickboardx.api.example;
@@ -253,7 +188,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import net.frostbyte.quickboardx.api.QuickBoardAPI;
 
-public class APIExample extends JavaPlugin {
+public class APIExample extends JavaPlugin implements Listener {
     @Override
     public void onEnable()
     {
@@ -271,6 +206,7 @@ public class APIExample extends JavaPlugin {
                     @Override
                     public void run()
                     {
+                        // Create a Temporary Board for each player online
                         for (Player p : Bukkit.getServer().getOnlinePlayers())
                         {
                             List<String> title = new ArrayList<>();
@@ -300,8 +236,39 @@ public class APIExample extends JavaPlugin {
                         }
                     }
                 }.runTask(plugin);
+
+                // Register your Plugin as a Listener, so it can respond to the PlayerJoinEvent
+                PluginManager pm = getServer().getPluginManager();
+        
+                pm.registerEvents(
+                    this,
+                    this
+                );
             }
         }
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event)
+    {
+        if (event == null)
+            return;
+    
+        // Assign the player to a team in the Player List.
+        // The team can be based upon a permission, for example, a luckperms group.
+        // This also requires you to have the team defined in a team configuration
+        // in your QuickBoardX plugin folder (plugins/QuickBoardX/teams/team.default.yml)
+        // Assuming that your own method for determining a player's team is called getPlayerTeam...
+        String teamName = getPlayerTeam(event.getPlayer());
+    
+        // Tell QuickBoardX to update each Online Player's Player List to
+        // show the player as a member of the team.
+        Bukkit.getPluginManager().callEvent(
+            new PlayerTeamUpdateEvent(
+                player.getUniqueId(),
+                teamName
+            )
+        );
     }
 }
 ```
@@ -318,12 +285,17 @@ public class APIExample extends JavaPlugin {
 [9]: https://discord.gg/MZNYhTA
 [10]: https://frostbyte.mycloudrepo.io/public/repositories/snapshots
 [11]: https://www.cloudrepo.io
-[logo]: https://github.com/frost-byte/QuickBoardX/blob/master/images/Layer-QuickboardX.png
+[logo]: images/Layer-QuickboardX.png
+[cloud]: images/CloudRepo-Square-Brand-Blue.png
+[gp_teams]: https://minecraft.gamepedia.com/Scoreboard#Teams
+[dummies_teams]: https://www.dummies.com/programming/programming-games/minecraft/how-to-create-teams-with-the-scoreboard-in-minecraft/
+[spigot_teams]: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/scoreboard/Team.html
+[api]: https://github.com/frost-byte/QuickBoardX/blob/master/quickboardx-core/src/main/java/net/frostbyte/quickboardx/api/QuickBoardAPI.java#L10
 
 ### Source Code
 [Github Repository][5]  
-[Github Maven Repository - Releases][6]  
-[Github Maven Repository - Snapshots][10]
+[CloudRepo Maven Repository - Releases][6]  
+[CloudRepo Maven Repository - Snapshots][10]
 
 ### Acknowledgements
 Thanks to [the_TadeSK][7] for the creation of [QuickBoard][8]; the plugin that QuickBoardX is based upon.

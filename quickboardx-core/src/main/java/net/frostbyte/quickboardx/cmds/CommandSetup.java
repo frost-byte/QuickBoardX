@@ -42,7 +42,7 @@ public class CommandSetup
 
 		CommandCompletions<BukkitCommandCompletionContext> comp = commandManager.getCommandCompletions();
 		comp.registerCompletion("boards", c -> plugin.getInfo().keySet());
-
+		comp.registerCompletion("teamConfigs", c -> plugin.getTeamInfo().keySet());
 		return this;
 	}
 

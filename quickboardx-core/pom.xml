@@ -14,8 +14,8 @@
 
     <properties>
         <paper.version>1.15.2-R0.1-SNAPSHOT</paper.version>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <mvdw.version>3.0.0-SNAPSHOT</mvdw.version>
         <placeholder.version>2.10.3</placeholder.version>
         <acf.version>0.5.0-SNAPSHOT</acf.version>
@@ -109,12 +109,6 @@
             <artifactId>aopalliance</artifactId>
             <version>1.0</version>
         </dependency>
-        <!-- javax.inject -->
-        <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-            <version>1</version>
-        </dependency>
         <!-- MVdW Placeholder API-->
         <dependency>
             <groupId>be.maximvdw</groupId>
@@ -138,18 +132,20 @@
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
-            <version>${guice.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.inject.extensions</groupId>
             <artifactId>guice-assistedinject</artifactId>
-            <version>${guice.version}</version>
         </dependency>
         <!-- Guava -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
+        </dependency>
+        <!-- javax.inject -->
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
         </dependency>
         <!-- JSON -->
         <dependency>
@@ -172,6 +168,11 @@
                     <artifactId>spigot</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>18.0.0</version>
         </dependency>
     </dependencies>
     <build>
@@ -197,6 +198,10 @@
                         <relocation>
                             <pattern>org.junit</pattern>
                             <shadedPattern>net.frostbyte.quickboardx.core.junit</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>javax.inject</pattern>
+                            <shadedPattern>net.frostbyte.quickboardx.core.javax.inject</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>co.aikar.commands</pattern>

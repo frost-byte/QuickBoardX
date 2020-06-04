@@ -14,11 +14,15 @@ import co.aikar.commands.annotation.Subcommand;
 import co.aikar.commands.annotation.Syntax;
 import co.aikar.commands.annotation.Values;
 import net.frostbyte.quickboardx.QuickBoardX;
+import net.frostbyte.quickboardx.api.Team;
 import net.frostbyte.quickboardx.util.VersionManager;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.List;
+
+import static net.frostbyte.quickboardx.util.StringConstants.ERROR_TEAM_DOES_NOT_EXIST;
 import static net.frostbyte.quickboardx.util.StringConstants.HEADER;
 
 @SuppressWarnings("unused")
@@ -105,6 +109,29 @@ public class BoardCommand extends BaseCommand
 
 		if (text != null && p.isOnline())
 			p.sendMessage(text);
+	}
+
+	@Description("Check the Team configuration.")
+	@Subcommand("check_team|t_check")
+	@CommandPermission("quickboardx.check")
+	public void checkTeamConfig(Player p)
+	{
+		String text = plugin.checkPlayerTeamConfig(p.getUniqueId());
+
+		if (text != null && p.isOnline())
+			p.sendMessage(text);
+	}
+
+	@Description("View your Player Tab List Team Information.")
+	@Subcommand("show_team|t_show")
+	@CommandPermission("quickboardx.check")
+	public void showTeamInfo(Player p)
+	{
+		Team team = plugin.getPlayersTeam(p.getUniqueId());
+		if (team != null)
+			p.sendMessage(team.information());
+		else
+			p.sendMessage(ERROR_TEAM_DOES_NOT_EXIST);
 	}
 
 	@Description("Sets the visible scoreboard for a player, using the board's name (permission).")
@@ -293,6 +320,23 @@ public class BoardCommand extends BaseCommand
 
 		if (result != null && !result.isEmpty())
 			sender.sendMessage(result);
+	}
+
+	@Description("List the Names of all Player Tab List Teams.")
+	@Subcommand("list_teams|lst")
+	@CommandPermission("quickboardx.info")
+	public void listTabTeams(CommandSender sender)
+	{
+		List<String> teamNames = plugin.tabListTeamNames();
+		StringBuilder builder = new StringBuilder("Tab List Teams");
+		builder.append("\n++++++++++++++++\n");
+
+		for (String teamName : teamNames)
+		{
+			builder.append(teamName)
+				.append("\n");
+		}
+		sender.sendMessage(builder.toString());
 	}
 
 	@Description("Add a world to the enabled worlds for a Scoreboard.")

@@ -8,8 +8,7 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.*;
 
-
-@SuppressWarnings({"FieldCanBeLocal", "MismatchedQueryAndUpdateOfCollection", "unused"})
+@SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal", "MismatchedQueryAndUpdateOfCollection", "unused"})
 public class BoardConfig extends ConfigurationHandler
 {
 	protected QuickBoardX plugin;
@@ -20,7 +19,7 @@ public class BoardConfig extends ConfigurationHandler
 	private static int SCROLLER_SPACE = 6;
 	private static int SCROLLER_UPDATE = 1;
 	private static char SCROLLER_CHAR = '&';
-	private HashMap<String, Scroller> scrollerText = new HashMap<>();
+	private final HashMap<String, Scroller> scrollerText = new HashMap<>();
 
 	public BoardConfig(
 		QuickBoardX plugin,

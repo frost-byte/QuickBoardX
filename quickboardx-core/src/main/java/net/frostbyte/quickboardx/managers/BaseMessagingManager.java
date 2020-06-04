@@ -2,6 +2,7 @@ package net.frostbyte.quickboardx.managers;
 
 import net.frostbyte.quickboardx.PluginUpdater.UpdateInfo;
 import net.frostbyte.quickboardx.QuickBoardX;
+import net.frostbyte.quickboardx.events.PlayerTeamUpdateEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -88,6 +89,18 @@ public abstract class BaseMessagingManager implements Listener
 			HEADER + "§6New version/your current version §a" + updateInfo.getVersion() +
 			"§7/§c" + plugin.getDescription().getVersion() +
 			HEADER + "§6Download update here: §ahttps://github.com/frost-byte/QuickBoardX/releases/";
+	}
+
+	public void onTeamUpdate(PlayerTeamUpdateEvent event)
+	{
+		if (event != null)
+		{
+			plugin.getLogger().info("BaseMessagingManager: onTeamUpdate...");
+			plugin.onTeamUpdate(
+				event.getTeamName(),
+				event.getPlayerId()
+			);
+		}
 	}
 
 	public void onJoin(PlayerJoinEvent event)

@@ -2,13 +2,17 @@ package net.frostbyte.quickboardx;
 
 import com.google.inject.Inject;
 import net.frostbyte.quickboardx.api.QuickBoardAPI;
+import net.frostbyte.quickboardx.api.Team;
+import net.frostbyte.quickboardx.api.TeamFactory;
 import net.frostbyte.quickboardx.cmds.BoardCommand;
 import net.frostbyte.quickboardx.cmds.CommandSetup;
 import net.frostbyte.quickboardx.config.BoardConfig;
+import net.frostbyte.quickboardx.config.TeamConfig;
 import net.frostbyte.quickboardx.managers.BaseBoardManager;
 import net.frostbyte.quickboardx.managers.BaseMessagingManager;
 import net.frostbyte.quickboardx.util.VersionManager;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
@@ -27,12 +31,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static net.frostbyte.quickboardx.util.StringConstants.ERROR_FAILED;
+
 @SuppressWarnings({"WeakerAccess", "FieldCanBeLocal", "unused"})
 public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 {
 	private boolean allowedJoinScoreboard;
 	private boolean MVdWPlaceholderAPI, PlaceholderAPI;
-	private HashMap<UUID, Long> playerWorldTimer = new HashMap<>();
+	private final HashMap<UUID, Long> playerWorldTimer = new HashMap<>();
 	private PluginUpdater pluginUpdater;
 	private boolean firstTimeUsePlugin = false;
 	private Metrics metrics;
@@ -43,6 +49,9 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 
 	@Inject
 	private BaseMessagingManager messagingManager;
+
+	@Inject
+	private TeamFactory teamFactory;
 
 	@Override
 	public void onEnable()
@@ -59,6 +68,7 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 
 		registerCommands();
 		loadScoreboards();
+		loadTeams();
 		registerConfig();
 		registerMetrics();
 		startUpdateTasks();
@@ -147,6 +157,8 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 	public boolean areMetricsEnabled() {
 		return metrics.isEnabled();
 	}
+
+	public TeamFactory getTeamFactory() { return teamFactory; }
 
 	private void loadScoreboards()
 	{
@@ -242,18 +254,18 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 			@Override
 			public void run()
 			{
-				for (UUID pid : playerWorldTimer.keySet())
+			for (UUID pid : playerWorldTimer.keySet())
+			{
+				long time = playerWorldTimer.get(pid);
+
+				if (time < System.currentTimeMillis())
+					continue;
+
+				if (isAllowedJoinScoreboard())
 				{
-					long time = playerWorldTimer.get(pid);
-
-					if (time < System.currentTimeMillis())
-						continue;
-
-					if (isAllowedJoinScoreboard())
-					{
-						createDefaultScoreboard(pid);
-					}
+					createDefaultScoreboard(pid);
 				}
+			}
 			}
 		}.runTaskTimer(this, 0, 20);
 	}
@@ -286,6 +298,7 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 			return;
 
 		boardManager.createDefaultScoreboard(playerID);
+		boardManager.setPlayerTeam(playerID, "default");
 		playerWorldTimer.remove(playerID);
 	}
 
@@ -322,6 +335,82 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 		}
 	}
 
+	private void loadTeams()
+	{
+		getLogger().info("Loading Team Configurations...");
+		File fo = new File(getDataFolder().getAbsolutePath() + "/teams/");
+		if (!fo.exists())
+		{
+			//noinspection ResultOfMethodCallIgnored
+			fo.mkdirs();
+
+			firstTimeUsePlugin = true;
+
+			File scFile = new File(getDataFolder().getAbsolutePath() + "/teams/teams.default.yml");
+
+			try
+			{
+				//noinspection ResultOfMethodCallIgnored
+				scFile.createNewFile();
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+
+			InputStream str = getResource("teams.default.yml");
+			try
+			{
+				if (str == null)
+					throw new IOException("Could not load default team settings.");
+				copy(str, scFile);
+			}
+			catch (IOException e1)
+			{
+				e1.printStackTrace();
+			}
+		}
+		loadTeams(fo);
+		getLogger().info("Teams loaded");
+	}
+
+	public void loadTeams(File fo)
+	{
+		if (fo == null)
+		{
+			getLogger().warning("Invalid Teams Directory!");
+			return;
+		}
+
+		File[] files = fo.listFiles();
+
+		if (files == null || files.length <= 0)
+		{
+			getLogger().warning("Invalid Teams Directory!");
+			return;
+		}
+
+		for (File f : files)
+		{
+			if (f.getName().endsWith(".yml"))
+			{
+				String fileName = f.getName().replace(".yml", "");
+				TeamConfig info = new TeamConfig(this, fileName, true);
+				boardManager.addTeamConfig(fileName, info);
+				getLogger().info("Loaded '" + f.getName() + "' from '" + fileName + "'");
+			}
+			else
+			{
+				getLogger().warning("File '" + f.getName() + "' is not accepted! Accepted only '.yml' files (YAML)");
+			}
+		}
+	}
+
+	public void registerTabListTeam(Team team)
+	{
+		boardManager.registerTabListTeam(team);
+	}
+
 	public String listScoreboards()
 	{
 		File fo = new File(getDataFolder().getAbsolutePath() + "/scoreboards");
@@ -341,6 +430,28 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 		return result.toString();
 	}
 
+	public String setTeamPlaceholders(String s, UUID playerID)
+	{
+		Player p = Bukkit.getPlayer(playerID);
+
+		if (p != null && s != null && !s.isEmpty())
+		{
+			if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI") && me.clip.placeholderapi.PlaceholderAPI.containsPlaceholders(s))
+				s = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(p, s);
+			if (isMVdWPlaceholderAPI())
+				s = be.maximvdw.placeholderapi.PlaceholderAPI.replacePlaceholders(p, s);
+
+			s = ChatColor.translateAlternateColorCodes('&', s);
+		}
+		return s;
+	}
+
+	/**
+	 * Copy the contents of the Source InputStream to the Destination File
+	 * @param src The source input stream
+	 * @param dst The destination file
+	 * @throws IOException Thrown when opening or writing to the output stream fails.
+	 */
 	public void copy(InputStream src, File dst) throws IOException
 	{
 		try
@@ -410,6 +521,25 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 			return Optional.empty();
 	}
 
+	@SuppressWarnings("SameParameterValue")
+	protected Optional<TeamConfig> getTeamConfig(
+		String teamName,
+		boolean readFile
+	) {
+		TeamConfig config = getTeamInfo().getOrDefault(
+			teamName,
+			new TeamConfig(this, teamName, readFile)
+		);
+
+		if (config != null && config.fileExists())
+		{
+			getTeamInfo().putIfAbsent(teamName, config);
+			return Optional.of(config);
+		}
+		else
+			return Optional.empty();
+	}
+
 	public void sendUpdateMessage()
 	{
 		String updateMessage = messagingManager.getUpdateMessage(getPluginUpdater().getUpdateInfo());
@@ -437,6 +567,11 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 	public String createNewBoard(String boardName, String worldName)
 	{
 		return boardManager.createNewBoard(boardName, worldName);
+	}
+
+	public String getTeamInformation(String teamName)
+	{
+		return boardManager.getTeamInformation(teamName);
 	}
 
 	public String addBoardTitle(String boardName, String title)
@@ -500,6 +635,11 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 		return boardManager.checkPlayerConfig(playerID);
 	}
 
+	public String checkPlayerTeamConfig(UUID playerID)
+	{
+		return boardManager.checkPlayerTeamConfig(playerID);
+	}
+
 	public String enablePlayerBoard(UUID playerID)
 	{
 		return boardManager.enablePlayerBoard(playerID);
@@ -508,6 +648,11 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 	public String reloadAllPlayerBoards()
 	{
 		return boardManager.reloadAllPlayerBoards();
+	}
+
+	public void reloadPlayerTeams()
+	{
+		boardManager.reloadPlayerTeams();
 	}
 
 	public void addPlayerWorldTimer(UUID playerID)
@@ -551,28 +696,39 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 		boardManager.addPlayerBoard(playerID, playerBoard);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public PlayerBoard createBoard(UUID playerID, String boardName)
 	{
 		return boardManager.createBoard(playerID, boardName);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public PlayerBoard createTemporaryBoard(UUID playerID, String boardName)
 	{
 		return boardManager.createTemporaryBoard(playerID, boardName);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public PlayerBoard createTemporaryBoard(
 		UUID playerID,
 		String boardName,
 		List<String> title,
-		List<String> text, int updateTitle,
+		List<String> text,
+		int updateTitle,
 		int updateText
 	){
 		return boardManager.createTemporaryBoard(
 			playerID,
+			boardName,
 			text,
 			title,
 			updateTitle,
@@ -580,6 +736,105 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 		);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean hasTeam(String teamName)
+	{
+		return getTeamInfo().containsKey(teamName);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void createTeamConfig(String configName, Team newTeam)
+	{
+		if (
+			configName != null &&
+			!configName.isEmpty() &&
+			newTeam != null &&
+			!hasTeam(newTeam.getName())
+		) {
+			TeamConfig teamConfig = new TeamConfig(this, configName, false);
+			teamConfig.addTeam(newTeam);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void addTeamToConfig(String configName, Team team)
+	{
+		if (
+			configName != null &&
+			!configName.isEmpty() &&
+			team != null
+		) {
+			TeamConfig teamConfig = getTeamInfo().getOrDefault(configName, new TeamConfig(this, configName, false));
+			teamConfig.addTeam(team);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void removeTeamFromConfig(String configName, String teamName)
+	{
+		if (
+			configName != null &&
+			!configName.isEmpty() &&
+			teamName != null &&
+			!teamName.isEmpty()
+		) {
+			TeamConfig teamConfig = getTeamInfo().getOrDefault(configName, new TeamConfig(this, configName, false));
+			// TODO: Update all player's showing the team in their Player Tab List
+			teamConfig.removeTeam(teamName);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void removePlayersTeam(UUID playerID)
+	{
+		boardManager.removePlayerFromTeam(playerID, getPlayersTeam(playerID));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setPlayersTeam(UUID playerID, String teamName)
+	{
+		boardManager.setPlayerTeam(playerID, teamName);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Team getPlayersTeam(UUID playerID)
+	{
+		return boardManager.getPlayerTeam(playerID);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void generatePlayersListTeams(UUID playerID)
+	{
+		boardManager.generateListTeams(playerID);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public PlayerBoard createBoard(
 		UUID playerID,
@@ -597,35 +852,53 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 		);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public List<PlayerBoard> getAllBoards()
 	{
 		return boardManager.getAllBoards();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public HashMap<UUID, PlayerBoard> getBoards()
 	{
 		return boardManager.getBoards();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void removeBoard(UUID playerID)
 	{
 		boardManager.removeBoard(playerID);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void updateText(UUID playerID)
 	{
 		boardManager.updateText(playerID);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void updateTitle(UUID playerID) {
 		boardManager.updateTitle(playerID);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void updateAll(UUID playerID) {
 		boardManager
@@ -633,9 +906,75 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 			.updateText(playerID);
 	}
 
+	@Override
+	public void updateTeamConfig(String configName, Team team)
+	{
+		if (configName == null || configName.isEmpty() || team == null)
+			return;
+
+		getTeamConfig(configName, false)
+		.ifPresent(
+			config -> {
+				Team currentTeam = config.getTeam(team.getName());
+				currentTeam.applyTeam(team);
+				boardManager.updateTeams();
+			}
+		);
+	}
+
+	/**
+	 * Process a Player Team Update Event; Fired by other plugins
+	 * that want to assign a player's team when they login or update
+	 * the team dynamically.
+	 * @param teamName The name of the player's new team
+	 * @param playerId The player's uuid
+	 */
+	public void onTeamUpdate(String teamName, UUID playerId)
+	{
+		getLogger().info("onTeamUpdate: " + teamName + "; " + playerId.toString());
+
+		boardManager
+			.setPlayerTeam(playerId, teamName)
+			.generateListTeams(playerId)
+			.updatePlayerListTeam(teamName);
+	}
+
 	public String listEnabledWorlds(String boardName)
 	{
 		return boardManager.listEnabledWorlds(boardName);
+	}
+
+	public String listPlayerTablistTeams(String configName)
+	{
+		TeamConfig config = getTeamInfo().getOrDefault(configName, null);
+
+		if (config != null)
+		{
+			StringBuilder builder = new StringBuilder();
+			for (String teamName : config.getTeamNames())
+			{
+				builder.append(teamName)
+					.append("\n");
+			}
+			return builder.toString();
+		}
+
+		return ERROR_FAILED;
+	}
+
+	public void onBoardChange(UUID playerId)
+	{
+
+	}
+
+	public List<String> tabListTeamNames()
+	{
+		return boardManager.getTabListTeamNames();
+	}
+
+	public String listEnabledTeamScoreboards(String configName)
+	{
+		return boardManager.listEnabledTeamScoreboards(configName);
 	}
 
 	public String addEnabledWorld(String boardName, String worldName)
@@ -651,6 +990,11 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 	public HashMap<String, BoardConfig> getInfo()
 	{
 		return boardManager.getBoardConfigMap();
+	}
+
+	public HashMap<String, TeamConfig> getTeamInfo()
+	{
+		return boardManager.getTeamConfigMap();
 	}
 
 	@SuppressWarnings("unused")
