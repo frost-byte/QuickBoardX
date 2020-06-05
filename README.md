@@ -157,7 +157,7 @@ UUID and the name of the Team that they are joining.
 ```
 
 
-![CloudRepo.io][cloud]
+[![CloudRepo.io][cloud]][11]
 >  _CloudRepo.io allows open source projects to use their services at no cost._
 >  _They provide Public, Private and Proxy Repositories_
 ##### Maven Repositories
