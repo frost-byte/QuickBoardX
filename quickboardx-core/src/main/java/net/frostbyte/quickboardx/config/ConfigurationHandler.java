@@ -6,18 +6,51 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+/** Abstraction for loading Custom Yaml Configuration files using the
+ * Bukkit Configuration API.
+ * @author frost-byte
+ * @since 1.0.0
+ */
 @SuppressWarnings( { "unused", "WeakerAccess", "ResultOfMethodCallIgnored" })
 public abstract class ConfigurationHandler
 {
+	/**
+	 * The base name of the configuration file. (Without the extension or path)
+	 */
 	protected String fileName;
+
+	/**
+	 * The path for the file within the plugin's data folder; includes subdirectories, file name and file extension.
+	 */
 	protected String filePath;
+
+	/**
+	 * Indicates whether the file should be read (that it should already exists)
+	 * Indicates that the file should be created when it is false.
+	 */
 	protected boolean readFile;
 
 	protected Logger logger;
+
+	/**
+	 * The folder where the configuration is stored - i.e. the plugin's datafolder
+	 */
 	protected File dataFolder;
 
+	/**
+	 * The File I/O Instance of the Configuration
+	 */
 	protected File file;
+
+	/**
+	 * The Configuration
+	 */
 	protected YamlConfiguration config;
+
+	/**
+	 * Indicates if a property in the config has been updated and needs to be
+	 * saved to disk.
+	 */
 	protected boolean isDirty;
 
 	public ConfigurationHandler(
@@ -52,6 +85,10 @@ public abstract class ConfigurationHandler
 		this(dataFolder, logger, null, fileName, false);
 	}
 
+	/**
+	 * Initialize the Configuration, will read from an existing file, if readFile is true,
+	 * or else create a new configuration file. Then the configuration is loaded into memory.
+	 */
 	public void init()
 	{
 		if (readFile)
@@ -63,14 +100,27 @@ public abstract class ConfigurationHandler
 		isDirty = false;
 	}
 
+	/**
+	 * @return Does the file need to be saved to Disk after a configuration update or change?
+	 */
 	public boolean shouldSave() { return isDirty;}
+
+	/**
+	 * Reload the Configuration from disk
+	 */
 	public void reloadConfig()
 	{
 		this.config = loadConfig();
 	}
 
+	/**
+	 * Add default configuration values to the config.
+	 */
 	protected abstract void addDefaults();
 
+	/**
+	 * Load the Configuration File
+	 */
 	protected void loadFile()
 	{
 		String fullPath = dataFolder.getPath() + File.separator;
@@ -87,6 +137,9 @@ public abstract class ConfigurationHandler
 		}
 	}
 
+	/**
+	 * @return Has the configuration file been loaded and does it exist on disk?
+	 */
 	public boolean fileExists() {
 		return file != null && file.exists();
 	}
@@ -101,14 +154,13 @@ public abstract class ConfigurationHandler
 		if (filePath != null)
 			fullPath += filePath + File.separator;
 
-		File file = new File(fullPath + fileName + ".yml");
-		file.getParentFile().mkdirs();
-
 		try
 		{
+			File file = new File(fullPath + fileName + ".yml");
+			file.getParentFile().mkdirs();
 			file.createNewFile();
 		}
-		catch (IOException e)
+		catch (NullPointerException | IOException | SecurityException e)
 		{
 			e.printStackTrace();
 		}
@@ -117,7 +169,7 @@ public abstract class ConfigurationHandler
 	}
 
 	/**
-	 * Returns the Yaml configuration instance of the file.
+	 * Loads and provides the Yaml configuration instance.
 	 */
 	protected YamlConfiguration loadConfig()
 	{
@@ -125,7 +177,8 @@ public abstract class ConfigurationHandler
 	}
 
 	/**
-	 * Saves all changes to the player data file.
+	 * Saves all values of the Config from memory to the file on disk.
+	 * @param addDefaults Should the default values be added to the config?
 	 */
 	protected void saveConfig(boolean addDefaults)
 	{
@@ -145,6 +198,9 @@ public abstract class ConfigurationHandler
 		}
 	}
 
+	/**
+	 * Save the Configuration to Disk
+	 */
 	public void saveConfig()
 	{
 		saveConfig(false);

@@ -60,7 +60,7 @@ public abstract class BaseMessagingManager implements Listener
 			playerName +
 			" §7to the QuickBoardX commands!" +
 			System.lineSeparator() +
-			"§7Plugin by §6frost-byteSK§7, version: §6" +
+			"§7Plugin by §6frost-byte§7, version: §6" +
 			plugin.getDescription().getVersion();
 	}
 
