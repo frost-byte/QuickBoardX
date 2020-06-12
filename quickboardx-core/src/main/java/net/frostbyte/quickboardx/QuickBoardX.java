@@ -291,7 +291,8 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 
 	/**
 	 * Retrieve the list of Scoreboard names that a player can use.
-	 * @param playerID The player's UUID
+	 *
+	 * @param playerID the player's UUID
 	 * @return the list of Scoreboard names that a player can use.
 	 */
 	private List<String> getBoardsForPlayer(UUID playerID) {
@@ -317,7 +318,8 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 
 	/**
 	 * Create the Default Sidebar Scoreboard and the Player Tab List for the given player.
-	 * @param playerID The player's UUID
+	 *
+	 * @param playerID the player's UUID
 	 */
 	public void createDefaultScoreboard(UUID playerID)
 	{
@@ -407,7 +409,8 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 
 	/**
 	 * Load All Player Tab List Team Configurations from QuickBoardX's teams directory.
-	 * @param fo The file object for the team configuration directory.
+	 *
+	 * @param fo the file object for the team configuration directory.
 	 */
 	public void loadTeams(File fo)
 	{
@@ -443,7 +446,8 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 
 	/**
 	 * Add a team to the Player Tab List
-	 * @param team The team to add to the list
+	 *
+	 * @param team the team to add to the list
 	 */
 	public void registerTabListTeam(Team team)
 	{
@@ -452,6 +456,7 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 
 	/**
 	 * Retrieve a list of the names of all currently loaded Scoreboard Configs
+	 *
 	 * @return the list of the names of all currently loaded Scoreboard Configs
 	 */
 	public String listScoreboards()
@@ -491,9 +496,10 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 
 	/**
 	 * Copy the contents of the Source InputStream to the Destination File
-	 * @param src The source input stream
-	 * @param dst The destination file
-	 * @throws IOException Thrown when opening or writing to the output stream fails.
+	 *
+	 * @param src the source input stream
+	 * @param dst the destination file
+	 * @throws IOException thrown when opening or writing to the output stream fails.
 	 */
 	public void copy(InputStream src, File dst) throws IOException
 	{
@@ -547,9 +553,10 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 
 	/**
 	 * Retrieve a Scoreboard Configuration by its name
-	 * @param boardName The name of the scoreboard
-	 * @param readFile Should the config be loaded from an existing file.
-	 * @return An Optional BoardConfig containing a valid config if it was loaded or created.
+	 *
+	 * @param boardName the name of the scoreboard
+	 * @param readFile should the config be loaded from an existing file.
+	 * @return an Optional BoardConfig containing a valid config if it was loaded or created.
 	 */
 	@SuppressWarnings("SameParameterValue")
 	protected Optional<BoardConfig> getConfig(
@@ -572,9 +579,10 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 
 	/**
 	 * Retrieve a Player Tab List Team Configuration by its name
-	 * @param teamConfigName The name of the team configuration
-	 * @param readFile Should the config be loaded from an existing file.
-	 * @return An Optional TeamConfig containing a valid config if it was loaded or created.
+	 *
+	 * @param teamConfigName the name of the team configuration
+	 * @param readFile should the config be loaded from an existing file.
+	 * @return an Optional TeamConfig containing a valid config if it was loaded or created.
 	 */
 	@SuppressWarnings("SameParameterValue")
 	protected Optional<TeamConfig> getTeamConfig(
@@ -619,9 +627,11 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 
 	/**
 	 * Switch the given player's current scoreboard to the specified board, if it exists.
-	 * @param playerID The player's UUID
-	 * @param boardName The name of the scoreboard that will be displayed
-	 * @return A message describing the success or failure of the operation.
+	 *
+	 * @param playerID the player's UUID
+	 * @param boardName the name of the scoreboard that will be displayed
+	 *
+	 * @return a message describing the success or failure of the operation.
 	 */
 	public String toggleCustomPlayerBoard(UUID playerID, String boardName)
 	{
@@ -630,9 +640,10 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 
 	/**
 	 * Create a new Scoreboard, visible when players are in the specified world.
-	 * @param boardName The name of the scoreboard that will be displayed
-	 * @param worldName The name of the world in which the scoreboard will be visible.
-	 * @return A message describing the success or failure of the operation.
+	 *
+	 * @param boardName the name of the scoreboard that will be displayed
+	 * @param worldName the name of the world in which the scoreboard will be visible.
+	 * @return a message describing the success or failure of the operation.
 	 */
 	public String createNewBoard(String boardName, String worldName)
 	{
@@ -641,7 +652,8 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 
 	/**
 	 * Retrieve Information for a Player Tab List Team
-	 * @param teamName The name of the team
+	 *
+	 * @param teamName the name of the team
 	 * @return a Player Tab List Team's Information
 	 */
 	public String getTeamInformation(String teamName)
@@ -651,9 +663,10 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 
 	/**
 	 * Add an entry to the list of values displayed in the Title of a Sidebar Scoreboard
-	 * @param boardName The name of the scoreboard
-	 * @param title The text entry that will be displayed in the Title.
-	 * @return A message containing the results of the operation.
+	 *
+	 * @param boardName the name of the scoreboard
+	 * @param title the text entry that will be displayed in the Title.
+	 * @return a message containing the results of the operation.
 	 */
 	public String addBoardTitle(String boardName, String title)
 	{
@@ -662,10 +675,11 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 
 	/**
 	 * Insert an entry into the list of values displayed in the Title of a Sidebar Scoreboard.
-	 * @param boardName The name of the scoreboard
-	 * @param lineNum The index into the Title list where the entry will be inserted.
-	 * @param text The text entry that will be displayed in the Title.
-	 * @return A message containing the results of the operation.
+	 *
+	 * @param boardName the name of the scoreboard
+	 * @param lineNum the index into the Title list where the entry will be inserted.
+	 * @param text the text entry that will be displayed in the Title.
+	 * @return a message containing the results of the operation.
 	 */
 	public String insertBoardTitleLine(
 		String boardName,
@@ -677,9 +691,12 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 
 	/**
 	 * Remove an entry from the list of values displayed in the Title of a Sidebar Scoreboard.
-	 * @param boardName The name of the scoreboard
-	 * @param lineNum The index of the entry in the Title list that will be removed.
-	 * @return A message containing the results of the operation.
+	 *
+	 * @param boardName the name of the scoreboard
+	 * @param lineNum the index of the entry in the Title list that will be removed.
+	 * @see BaseBoardManager#removeBoardTitleLine(String, int)
+	 *
+	 * @return a message containing the results of the operation.
 	 */
 	public String removeBoardTitleLine(String boardName, int lineNum)
 	{
@@ -688,9 +705,10 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 
 	/**
 	 * Add a Line of Text to the Body of a Sidebar Scoreboard
-	 * @param boardName The name of the scoreboard
-	 * @param text The line of text that will be added.
-	 * @return A message containing the results of the operation.
+	 *
+	 * @param boardName the name of the scoreboard
+	 * @param text the line of text that will be added.
+	 * @return a message containing the results of the operation.
 	 */
 	public String addBoardText(String boardName, String text)
 	{
@@ -699,10 +717,11 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 
 	/**
 	 * Insert an entry into the list of values displayed in the Body of a Sidebar Scoreboard.
-	 * @param boardName The name of the scoreboard
-	 * @param lineNum The index into the Body text list where the entry will be inserted.
-	 * @param text The text entry that will be displayed in the Body of the scoreboard.
-	 * @return A message containing the results of the operation.
+	 *
+	 * @param boardName the name of the scoreboard
+	 * @param lineNum the index into the Body text list where the entry will be inserted.
+	 * @param text the text entry that will be displayed in the Body of the scoreboard.
+	 * @return a message containing the results of the operation.
 	 */
 	public String insertBoardTextLine(
 		String boardName,
@@ -713,10 +732,11 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 	}
 
 	/**
-	 * Remove an entry from the list of values displayed in the Body of a Sidebar Scoreboard.
-	 * @param boardName The name of the scoreboard
-	 * @param lineNum The index of the entry in the Body text list that will be removed.
-	 * @return A message containing the results of the operation.
+	 * Remove an entry from the list of values displayed in the Body of a Sidebar Scoreboard
+	 *
+	 * @param boardName the name of the scoreboard
+	 * @param lineNum the index of the entry in the Body text list that will be removed.
+	 * @return a message containing the results of the operation.
 	 */
 	public String removeBoardTextLine(String boardName, int lineNum)
 	{
@@ -725,9 +745,10 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 
 	/**
 	 * Set the given player's scoreboard
-	 * @param playerID The Player's UUID
-	 * @param boardName The name of the scoreboard that will be displayed
-	 * @return A message containing the results of the operation.
+	 *
+	 * @param playerID the player's UUID
+	 * @param boardName the name of the scoreboard that will be displayed
+	 * @return a message containing the results of the operation.
 	 */
 	public String selectPlayerBoard(UUID playerID, String boardName)
 	{
@@ -736,8 +757,9 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 
 	/**
 	 * Toggle display of the given player's scoreboard on/off
-	 * @param playerID The Player's UUID
-	 * @return A message containing the results of the operation.
+	 *
+	 * @param playerID the player's UUID
+	 * @return a message containing the results of the operation.
 	 */
 	public String togglePlayerBoard(UUID playerID)
 	{
@@ -746,8 +768,9 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 
 	/**
 	 * Display the given player's next available scoreboard viewable in their current world
-	 * @param playerID The Player's UUID
-	 * @return A message containing the results of the operation.
+	 *
+	 * @param playerID the Player's UUID
+	 * @return a message containing the results of the operation.
 	 */
 	public String nextPlayerBoard(UUID playerID)
 	{
@@ -756,8 +779,9 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 
 	/**
 	 * Switch the given player's Displayed scoreboard the one before it in the list the player's viewable scoreboards
-	 * @param playerID The Player's UUID
-	 * @return A message containing the results of the operation.
+	 *
+	 * @param playerID the Player's UUID
+	 * @return a message containing the results of the operation.
 	 */
 	public String prevPlayerBoard(UUID playerID)
 	{
@@ -766,8 +790,9 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 
 	/**
 	 * Describe the given player's settings for each of the available Sidebar scoreboards
-	 * @param playerID The player's UUID
-	 * @return The description of the board settings for the given player, based upon their current world/permissions
+	 *
+	 * @param playerID the player's UUID
+	 * @return the description of the board settings for the given player, based upon their current world/permissions
 	 */
 	public String checkPlayerConfig(UUID playerID)
 	{
@@ -776,8 +801,9 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 
 	/**
 	 * Describe the given player's settings for each of the available Player Tab List Teams
-	 * @param playerID The player's UUID
-	 * @return The description of the Player Tab List Team settings for the given player, based upon their current
+	 *
+	 * @param playerID the player's UUID
+	 * @return the description of the Player Tab List Team settings for the given player, based upon their current
 	 * scoreboard/permissions
 	 */
 	public String checkPlayerTeamConfig(UUID playerID)
@@ -785,21 +811,38 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 		return boardManager.checkPlayerTeamConfig(playerID);
 	}
 
+	/**
+	 * @see BaseBoardManager#enablePlayerBoard(UUID)
+	 *
+	 * @param playerID the player's UUID
+	 * @return a message describing the result of the operation
+	 */
 	public String enablePlayerBoard(UUID playerID)
 	{
 		return boardManager.enablePlayerBoard(playerID);
 	}
 
+	/**
+	 * @see BaseBoardManager#reloadAllPlayerBoards()
+	 * @return a message describing the result of the operation
+	 */
 	public String reloadAllPlayerBoards()
 	{
 		return boardManager.reloadAllPlayerBoards();
 	}
 
+	/**
+	 * @see BaseBoardManager#reloadPlayerTeams()
+	 */
 	public void reloadPlayerTeams()
 	{
 		boardManager.reloadPlayerTeams();
 	}
 
+	/**
+	 * Track a World Timer for updating a player's scoreboard
+	 * @param playerID the player's UUID
+	 */
 	public void addPlayerWorldTimer(UUID playerID)
 	{
 		playerWorldTimer.put(
@@ -808,22 +851,39 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 		);
 	}
 
+	/**
+	 * Remove the Scoreboard Update Timer for a player.
+	 * @param playerID the player's UUID
+	 */
 	public void removePlayerWorldTimer(UUID playerID)
 	{
 		playerWorldTimer.remove(playerID);
 	}
 
+	/**
+	 * Completely unregister/remove a player from the plugin.
+	 * This stops their world timer/scoreboard update and unregister's
+	 * the player's custom scoreboards.
+	 *
+	 * @param playerID the player's UUID
+	 */
 	public void removePlayer(UUID playerID)
 	{
 		removePlayerWorldTimer(playerID);
 		removePlayerBoards(playerID);
 	}
 
+	/**
+	 * @see BaseBoardManager#removePlayerBoard(UUID)
+	 */
 	public void removePlayerBoards(UUID playerID)
 	{
 		boardManager.removePlayerBoard(playerID);
 	}
 
+	/**
+	 * @see BaseBoardManager#removePlayerBoard(UUID)
+	 */
 	public void removePlayerBoard(
 		UUID playerID,
 		PlayerBoard playerBoard
@@ -831,11 +891,23 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 		boardManager.removePlayerBoard(playerID);
 	}
 
+	/**
+	 * Create the Scoreboards for a Player
+	 * TODO: Change param to UUID?
+	 * @param player the player whose board will be created
+	 * @see BaseBoardManager#createPlayerBoards(UUID)
+	 */
 	public void createPlayerBoards(Player player)
 	{
 		boardManager.createPlayerBoards(player.getUniqueId());
 	}
 
+	/**
+	 * Add a PlayerBoard for the given player
+	 * @param playerID the player's UUID
+	 * @param playerBoard the PlayerBoard
+	 * @see BaseBoardManager#addPlayerBoard(UUID, PlayerBoard)
+	 */
 	public void addPlayerBoard(UUID playerID, PlayerBoard playerBoard)
 	{
 		boardManager.addPlayerBoard(playerID, playerBoard);
@@ -1074,8 +1146,9 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 	 * Process a Player Team Update Event; Fired by other plugins
 	 * that want to assign a player's team when they login or update
 	 * the team dynamically.
-	 * @param teamName The name of the player's new team
-	 * @param playerId The player's uuid
+	 *
+	 * @param teamName the name of the player's new team
+	 * @param playerId the player's uuid
 	 */
 	public void onTeamUpdate(String teamName, UUID playerId)
 	{
@@ -1087,11 +1160,19 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 			.updatePlayerListTeam(teamName);
 	}
 
+	/**
+	 * @see BaseBoardManager#listEnabledWorlds(String)
+	 */
 	public String listEnabledWorlds(String boardName)
 	{
 		return boardManager.listEnabledWorlds(boardName);
 	}
 
+	/**
+	 * Create a list of all Player Tab List Team names defined in a Team Config
+	 * @param configName the Team Config name
+	 * @return the list of team names
+	 */
 	public String listPlayerTablistTeams(String configName)
 	{
 		TeamConfig config = getTeamInfo().getOrDefault(configName, null);
@@ -1110,48 +1191,76 @@ public class QuickBoardX extends JavaPlugin implements Listener, QuickBoardAPI
 		return ERROR_FAILED;
 	}
 
-	public void onBoardChange(UUID playerId)
-	{
-
-	}
-
+	/**
+	 * @see BaseBoardManager#getTabListTeamNames()
+	 * @return A list of the names of all QuickBoardX teams registered for display in the Player Tab List
+	 */
 	public List<String> tabListTeamNames()
 	{
 		return boardManager.getTabListTeamNames();
 	}
 
+	/**
+	 * @see BaseBoardManager#listEnabledTeamScoreboards(String)
+	 * @param configName the name of the team config
+	 * @return a list of all scoreboards that that will display the Player Tab List Teams
+	 * registered in a Team Config
+	 */
 	public String listEnabledTeamScoreboards(String configName)
 	{
 		return boardManager.listEnabledTeamScoreboards(configName);
 	}
 
+	/**
+	 * @see BaseBoardManager#addEnabledWorld(String, String)
+	 * @param boardName the scoreboard's name
+	 * @param worldName the world's name
+	 * @return a description of operation's result
+	 */
 	public String addEnabledWorld(String boardName, String worldName)
 	{
 		return boardManager.addEnabledWorld(boardName, worldName);
 	}
 
+	/**
+	 * @see BaseBoardManager#removeEnabledWorld(String, String)
+	 * @param boardName the scoreboard's name
+	 * @param worldName the world's name
+	 * @return a description of operation's result
+	 */
 	public String removeEnabledWorld(String boardName, String worldName)
 	{
 		return boardManager.removeEnabledWorld(boardName, worldName);
 	}
 
+	/**
+	 * Retrieve the map of board config names and their related Scoreboard Configuration
+	 * TODO: Determine whether access should be more limited
+	 * @return the map of configurations
+	 */
 	public HashMap<String, BoardConfig> getInfo()
 	{
 		return boardManager.getBoardConfigMap();
 	}
 
+	/**
+	 * Retrieve the map of player list team config names and related Team Configurations
+	 * @return the map of configurations
+	 */
 	public HashMap<String, TeamConfig> getTeamInfo()
 	{
 		return boardManager.getTeamConfigMap();
 	}
 
-	@SuppressWarnings("unused")
-	public HashMap<UUID, Long> getPlayerWorldTimer()
+	/**
+	 * Retrieve the map of player uuids to each player's world timer
+	 * @return the map of player world timers
+	 */
+	public HashMap<UUID, Long> getPlayerWorldTimers()
 	{
 		return playerWorldTimer;
 	}
 
-	@SuppressWarnings("unused")
 	public PluginUpdater getPluginUpdater()
 	{
 		return pluginUpdater;

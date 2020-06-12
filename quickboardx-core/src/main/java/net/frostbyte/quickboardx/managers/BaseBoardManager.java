@@ -1545,6 +1545,12 @@ public abstract class BaseBoardManager
 		return text;
 	}
 
+	/**
+	 * Reload the Team Config and any related Teams for the Player Tab List,
+	 * then reassign all online player's to their respective teams for
+	 * all active Player Scoreboards.
+	 * @return A message describing the result of the operation.
+	 */
 	public String reloadPlayerTeams()
 	{
 		String text =
