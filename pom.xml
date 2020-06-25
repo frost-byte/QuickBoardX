@@ -7,7 +7,7 @@
     <groupId>net.frostbyte.quickboardx</groupId>
     <artifactId>quickboardx-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.2.0-SNAPSHOT</version>
     <name>QuickBoardX</name>
     <description>A Free Scoreboard Bukkit plugin</description>
 
@@ -82,6 +82,12 @@
                 <artifactId>javax.inject</artifactId>
                 <version>${javax.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
+                <type>maven-plugin</type>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <modules>
@@ -90,14 +96,51 @@
         <module>QuickboardX_1_12_R1</module>
         <module>QuickboardX_1_14_R1</module>
         <module>QuickboardX_1_15_R1</module>
+        <module>QuickboardX_1_16_R1</module>
         <module>dist</module>
     </modules>
 
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <noqualifier>all</noqualifier>
+                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <id>aggregate</id>
+                        <inherited>false</inherited>
+                        <reports>
+                            <report>aggregate</report>
+                        </reports>
+                    </reportSet>
+                    <reportSet>
+                        <id>default</id>
+                        <reports>
+                            <report>javadoc</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+        </plugins>
+    </reporting>
     <repositories>
         <!-- Paper MC -->
         <repository>
             <id>papermc</id>
             <url>https://papermc.io/repo/repository/maven-public/</url>
+        </repository>
+
+        <repository>
+            <id>spigot-snapshots</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>spigot-releases</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/releases/</url>
         </repository>
 
         <!-- frost-byte snapshots -->

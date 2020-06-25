@@ -268,38 +268,36 @@ public abstract class BaseBoardManager
 	 */
 	public BaseBoardManager generateListTeams(UUID playerId)
 	{
-		// Iterated Player
 		String playerName = getPlayerName(playerId);
 		PlayerBoard playerBoard = getPlayerBoard(playerId);
 
-		logger.info(
-			"BoardManager: generateListTeams for " + playerName
-		);
+		logger.info("BoardManager: generateListTeams for " + playerName);
+
 		if (playerBoard == null)
 			return this;
 
 		String boardName = playerBoard.getBoardName();
 
-		teams.values().forEach(
-			team -> {
-				TeamConfig teamConfig = findTeamConfig(team.getName());
-
-				if (
-					teamConfig != null &&
-						(
-							teamConfig.applyToAllScoreboards() ||
-								teamConfig.getEnabledScoreboards().contains(boardName)
-						)
-				) {
-					logger.info(
-						"BoardManager: generateListTeams -> updating Scoreboard Team named " + team.getName() +
-							" for " + playerName
-					);
-					applyTeamEntries(team, playerId);
-				}
+		teams.values().forEach(team -> {
+			if (canApplyTeam(team, boardName)) {
+				applyTeamEntries(team, playerId);
 			}
-		);
+		});
+
 		return this;
+	}
+
+	/**
+	 * Determines if a scoreboard should display the entries for a given Player Tab list team
+	 * @param team the Player tab list team
+	 * @param boardName the scoreboard's name
+	 * @return true if the scoreboard is allowed to show the team's entries in the Tab list
+	 */
+	protected boolean canApplyTeam(Team team, String boardName)
+	{
+		TeamConfig teamConfig = findTeamConfig(team.getName());
+
+		return teamConfig != null && (teamConfig.applyToAllScoreboards() ||teamConfig.getEnabledScoreboards().contains(boardName));
 	}
 
 	/**

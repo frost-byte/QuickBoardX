@@ -5,7 +5,7 @@ ___
 - Free!
 - No Flickering or Artifacts
 - Per Player Scoreboards for the Sidebar and Player Tab List
-- Compatible with 1.8.8, 1.12.2, 1.14.4 and 1.15.2
+- Compatible with 1.8.8, 1.12.2, 1.14.4, 1.15.2 and 1.16.1
 - Updating Title 
 - Scrolling Text Elements
 - Changeable Text Elements
@@ -152,7 +152,7 @@ UUID and the name of the Team that they are joining.
 <dependency>
     <groupId>net.frostbyte.quickboardx</groupId>
     <artifactId>quickboardx-core</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.2.0-SNAPSHOT</version>
 </dependency>
 ```
 

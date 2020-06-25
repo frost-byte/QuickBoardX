@@ -8,7 +8,7 @@
     <parent>
         <groupId>net.frostbyte.quickboardx</groupId>
         <artifactId>quickboardx-parent</artifactId>
-        <version>1.1.0-SNAPSHOT</version>
+        <version>1.2.0-SNAPSHOT</version>
     </parent>
 
     <build>
@@ -92,6 +92,13 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>quickboardx-1_15_R1</artifactId>
+            <version>${project.parent.version}</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>quickboardx-1_16_R1</artifactId>
             <version>${project.parent.version}</version>
             <type>jar</type>
             <scope>compile</scope>

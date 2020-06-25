@@ -9,41 +9,57 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>quickboardx-1_15_R1</artifactId>
+    <artifactId>quickboardx-1_16_R1</artifactId>
     <packaging>jar</packaging>
 
     <properties>
         <acf.version>0.5.0-SNAPSHOT</acf.version>
         <guice.version>4.2.0</guice.version>
-        <guava.version>27.1-jre</guava.version>
         <paper.version>1.15.2-R0.1-SNAPSHOT</paper.version>
-        <mc.version>v1_15_R1</mc.version>
+        <spigot.version>1.16.1-R0.1-SNAPSHOT</spigot.version>
+        <mc.version>v1_16_R1</mc.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
     <dependencies>
         <!-- Paper API (extends Bukkit) -->
+<!--        <dependency>-->
+<!--            <groupId>com.destroystokyo.paper</groupId>-->
+<!--            <artifactId>paper-api</artifactId>-->
+<!--            <version>${paper.version}</version>-->
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <groupId>com.google.guava</groupId>-->
+<!--                    <artifactId>guava</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>com.googlecode</groupId>-->
+<!--                    <artifactId>json-simple</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>commons-lang</groupId>-->
+<!--                    <artifactId>commons-lang</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>it.unimi.dsi</groupId>-->
+<!--                    <artifactId>fastutil</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
+<!--        </dependency>-->
+        <!-- Spigot API (extends Bukkit) -->
         <dependency>
-            <groupId>com.destroystokyo.paper</groupId>
-            <artifactId>paper-api</artifactId>
-            <version>${paper.version}</version>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>${spigot.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.guava</groupId>
                     <artifactId>guava</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>com.googlecode</groupId>
-                    <artifactId>json-simple</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>commons-lang</groupId>
                     <artifactId>commons-lang</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>it.unimi.dsi</groupId>
-                    <artifactId>fastutil</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
