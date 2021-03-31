@@ -20,7 +20,7 @@
         <aop.version>1.0</aop.version>
         <javax.version>1</javax.version>
         <guice.version>4.2.0</guice.version>
-        <guava.version>27.1-jre</guava.version>
+        <guava.version>29.0-jre</guava.version>
     </properties>
 
     <dependencyManagement>

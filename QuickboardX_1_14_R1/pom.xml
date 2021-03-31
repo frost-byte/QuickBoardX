@@ -15,7 +15,7 @@
     <properties>
         <acf.version>0.5.0-SNAPSHOT</acf.version>
         <guice.version>4.2.0</guice.version>
-        <guava.version>27.1-jre</guava.version>
+        <guava.version>29.0-jre</guava.version>
         <paper.version>1.14.4-R0.1-SNAPSHOT</paper.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
